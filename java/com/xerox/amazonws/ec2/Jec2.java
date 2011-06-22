@@ -61,6 +61,7 @@ import com.xerox.amazonws.typica.jaxb.CreateImageResponse;
 import com.xerox.amazonws.typica.jaxb.CreateKeyPairResponse;
 import com.xerox.amazonws.typica.jaxb.CreateSnapshotResponse;
 import com.xerox.amazonws.typica.jaxb.CreateSpotDatafeedSubscriptionResponse;
+import com.xerox.amazonws.typica.jaxb.CreateTagsResponse;
 import com.xerox.amazonws.typica.jaxb.CreateVolumeResponse;
 import com.xerox.amazonws.typica.jaxb.CreateVolumePermissionItemType;
 import com.xerox.amazonws.typica.jaxb.ConfirmProductInstanceResponse;
@@ -70,6 +71,7 @@ import com.xerox.amazonws.typica.jaxb.DeleteKeyPairResponse;
 import com.xerox.amazonws.typica.jaxb.DeleteSecurityGroupResponse;
 import com.xerox.amazonws.typica.jaxb.DeleteSnapshotResponse;
 import com.xerox.amazonws.typica.jaxb.DeleteSpotDatafeedSubscriptionResponse;
+import com.xerox.amazonws.typica.jaxb.DeleteTagsResponse;
 import com.xerox.amazonws.typica.jaxb.DeleteVolumeResponse;
 import com.xerox.amazonws.typica.jaxb.DeregisterImageResponse;
 import com.xerox.amazonws.typica.jaxb.DescribeAddressesResponse;
@@ -94,6 +96,7 @@ import com.xerox.amazonws.typica.jaxb.DescribeSnapshotsSetResponseType;
 import com.xerox.amazonws.typica.jaxb.DescribeSnapshotsSetItemResponseType;
 import com.xerox.amazonws.typica.jaxb.DescribeSpotDatafeedSubscriptionResponse;
 import com.xerox.amazonws.typica.jaxb.DescribeSpotInstanceRequestsResponse;
+import com.xerox.amazonws.typica.jaxb.DescribeTagsResponse;
 import com.xerox.amazonws.typica.jaxb.DescribeVolumesResponse;
 import com.xerox.amazonws.typica.jaxb.DescribeVolumesSetResponseType;
 import com.xerox.amazonws.typica.jaxb.DescribeVolumesSetItemResponseType;
@@ -110,6 +113,7 @@ import com.xerox.amazonws.typica.jaxb.GetConsoleOutputResponse;
 import com.xerox.amazonws.typica.jaxb.GetPasswordDataResponse;
 import com.xerox.amazonws.typica.jaxb.GroupItemType;
 import com.xerox.amazonws.typica.jaxb.GroupSetType;
+import com.xerox.amazonws.typica.jaxb.ImportKeyPairResponse;
 import com.xerox.amazonws.typica.jaxb.InstanceStateChangeSetType;
 import com.xerox.amazonws.typica.jaxb.InstanceStateChangeType;
 import com.xerox.amazonws.typica.jaxb.IpPermissionSetType;
@@ -143,6 +147,8 @@ import com.xerox.amazonws.typica.jaxb.ReservationInfoType;
 import com.xerox.amazonws.typica.jaxb.ResetImageAttributeResponse;
 import com.xerox.amazonws.typica.jaxb.ResetInstanceAttributeResponse;
 import com.xerox.amazonws.typica.jaxb.ResetSnapshotAttributeResponse;
+import com.xerox.amazonws.typica.jaxb.ResourceTagSetItemType;
+import com.xerox.amazonws.typica.jaxb.ResourceTagSetType;
 import com.xerox.amazonws.typica.jaxb.RunningInstancesItemType;
 import com.xerox.amazonws.typica.jaxb.RunningInstancesSetType;
 import com.xerox.amazonws.typica.jaxb.RunInstancesResponse;
@@ -152,6 +158,8 @@ import com.xerox.amazonws.typica.jaxb.SpotPriceHistorySetItemType;
 import com.xerox.amazonws.typica.jaxb.SpotInstanceRequestSetItemType;
 import com.xerox.amazonws.typica.jaxb.StartInstancesResponse;
 import com.xerox.amazonws.typica.jaxb.StopInstancesResponse;
+import com.xerox.amazonws.typica.jaxb.TagSetItemType;
+import com.xerox.amazonws.typica.jaxb.TagSetType;
 import com.xerox.amazonws.typica.jaxb.TerminateInstancesResponse;
 import com.xerox.amazonws.typica.jaxb.UserIdGroupPairType;
 import com.xerox.amazonws.typica.jaxb.UserIdGroupPairSetType;
@@ -213,7 +221,7 @@ public class Jec2 extends AWSQueryConnection {
     {
 		super(awsAccessId, awsSecretKey, isSecure, server, port);
 		ArrayList<String> vals = new ArrayList<String>();
-		vals.add("2010-06-15");
+		vals.add("2010-11-15");
 		super.headers.put("Version", vals);
     }
 
@@ -365,11 +373,23 @@ public class Jec2 extends AWSQueryConnection {
 	 * @throws EC2Exception wraps checked exceptions
 	 */
 	public List<ImageDescription> describeImages(List<String> imageIds) throws EC2Exception {
+		return describeImages(imageIds, null);
+	}
+
+	/**
+	 * Describe the given AMIs.
+	 * 
+	 * @param imageIds A list of AMI IDs as returned by {@link #registerImage(String)}.
+	 * @param filters map of filters to apply to this request.
+	 * @return A list of {@link ImageDescription} instances describing each AMI ID.
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<ImageDescription> describeImages(List<String> imageIds, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		for (int i=0 ; i<imageIds.size(); i++) {
 			params.put("ImageId."+(i+1), imageIds.get(i));
 		}
-		return describeImages(params);
+		return describeImages(params, filters);
 	}
 
 	/**
@@ -380,11 +400,23 @@ public class Jec2 extends AWSQueryConnection {
 	 * @throws EC2Exception wraps checked exceptions
 	 */
 	public List<ImageDescription> describeImagesByOwner(List<String> owners) throws EC2Exception {
+		return describeImagesByOwner(owners, null);
+	}
+
+	/**
+	 * Describe the AMIs belonging to the supplied owners.
+	 * 
+	 * @param owners A list of owners.
+	 * @param filters map of filters to apply to this request.
+	 * @return A list of {@link ImageDescription} instances describing each AMI ID.
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<ImageDescription> describeImagesByOwner(List<String> owners, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		for (int i=0 ; i<owners.size(); i++) {
 			params.put("Owner."+(i+1), owners.get(i));
 		}
-		return describeImages(params);
+		return describeImages(params, filters);
 	}
 
 	/**
@@ -395,11 +427,23 @@ public class Jec2 extends AWSQueryConnection {
 	 * @throws EC2Exception wraps checked exceptions
 	 */
 	public List<ImageDescription> describeImagesByExecutability(List<String> users) throws EC2Exception {
+		return describeImagesByExecutability(users, null);
+	}
+
+	/**
+	 * Describe the AMIs executable by supplied users.
+	 * 
+	 * @param users A list of users.
+	 * @param filters map of filters to apply to this request.
+	 * @return A list of {@link ImageDescription} instances describing each AMI ID.
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<ImageDescription> describeImagesByExecutability(List<String> users, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		for (int i=0 ; i<users.size(); i++) {
 			params.put("ExecutableBy."+(i+1), users.get(i));
 		}
-		return describeImages(params);
+		return describeImages(params, filters);
 	}
 
 	/**
@@ -413,6 +457,20 @@ public class Jec2 extends AWSQueryConnection {
 	 */
 	public List<ImageDescription> describeImages(List<String> imageIds, List<String> owners,
 										List<String> users) throws EC2Exception {
+		return describeImages(imageIds, owners, users, null);
+	}
+
+	/**
+	 * Describe the AMIs that match the intersection of the criteria supplied
+	 * 
+	 * @param imageIds A list of AMI IDs as returned by {@link #registerImage(String)}.
+	 * @param owners A list of owners.
+	 * @param users A list of users.
+	 * @return A list of {@link ImageDescription} instances describing each AMI ID.
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<ImageDescription> describeImages(List<String> imageIds, List<String> owners,
+										List<String> users, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		for (int i=0 ; i<imageIds.size(); i++) {
 			params.put("ImageId."+(i+1), imageIds.get(i));
@@ -423,14 +481,16 @@ public class Jec2 extends AWSQueryConnection {
 		for (int i=0 ; i<users.size(); i++) {
 			params.put("ExecutableBy."+(i+1), users.get(i));
 		}
-		return describeImages(params);
+		return describeImages(params, filters);
 	}
 
 
-	protected List<ImageDescription> describeImages(Map<String, String> params) throws EC2Exception {
-		HttpGet method = new HttpGet();
+	protected List<ImageDescription> describeImages(Map<String, String> params, Map<String, List<String>> filters) throws EC2Exception {
+		//HttpGet method = new HttpGet();
+		HttpPost method = new HttpPost();
 		DescribeImagesResponse response =
 				makeRequestInt(method, "DescribeImages", params, DescribeImagesResponse.class);
+		createFilterParams(params, filters);
 		List<ImageDescription> result = new ArrayList<ImageDescription>();
 		DescribeImagesResponseInfoType set = response.getImagesSet();
 		Iterator set_iter = set.getItems().iterator();
@@ -472,7 +532,8 @@ public class Jec2 extends AWSQueryConnection {
 					item.getKernelId(), item.getRamdiskId(), item.getPlatform(),
 					reason, item.getImageOwnerAlias(),
 					item.getName(), item.getDescription(), item.getRootDeviceType(),
-					item.getRootDeviceName(), bdm, item.getVirtualizationType()));
+					item.getRootDeviceName(), bdm, item.getVirtualizationType(),
+					getTagSet(item.getTagSet()), item.getHypervisor()));
 		}
 		return result;
 	}
@@ -818,10 +879,28 @@ public class Jec2 extends AWSQueryConnection {
 	 * @throws EC2Exception wraps checked exceptions
 	 */
 	public List<ReservationDescription> describeInstances(List<String> instanceIds) throws EC2Exception {
+		return describeInstances(instanceIds, null);
+	}
+
+	/**
+	 * Gets a list of running instances.
+	 * <p>
+	 * If the list of instance IDs is empty then a list of all instances owned
+	 * by the caller will be returned. Otherwise the list will contain
+	 * information for the requested instances only.
+	 * 
+	 * @param instanceIds A list of instances ({@link com.xerox.amazonws.ec2.ReservationDescription.Instance#instanceId}.
+	 * @param filters map of filters to apply to this request. (fingerprint or key-name currently)
+	 * @return A list of {@link com.xerox.amazonws.ec2.ReservationDescription} instances.
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<ReservationDescription> describeInstances(List<String> instanceIds, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		for (int i=0 ; i<instanceIds.size(); i++) {
 			params.put("InstanceId."+(i+1), instanceIds.get(i));
 		}
+		createFilterParams(params, filters);
+
 		HttpGet method = new HttpGet();
 		DescribeInstancesResponse response =
 				makeRequestInt(method, "DescribeInstances", params, DescribeInstancesResponse.class);
@@ -1019,10 +1098,25 @@ public class Jec2 extends AWSQueryConnection {
 	 */
 	public List<GroupDescription> describeSecurityGroups(List<String> groupNames)
 			throws EC2Exception {
+		return describeSecurityGroups(groupNames, null);
+	}
+
+	/**
+	 * Gets a list of security groups and their associated permissions.  
+	 * 
+	 * @param groupNames A list of groups to describe.
+	 * @param filters map of filters to apply to this request.
+	 * @return A list of groups ({@link GroupDescription}.
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<GroupDescription> describeSecurityGroups(List<String> groupNames, Map<String, List<String>> filters)
+			throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		for (int i=0 ; i<groupNames.size(); i++) {
 			params.put("GroupName."+(i+1), groupNames.get(i));
 		}
+		createFilterParams(params, filters);
+
 		HttpGet method = new HttpGet();
 		DescribeSecurityGroupsResponse response =
 				makeRequestInt(method, "DescribeSecurityGroups", params, DescribeSecurityGroupsResponse.class);
@@ -1199,10 +1293,27 @@ public class Jec2 extends AWSQueryConnection {
 	 */
 	public List<KeyPairInfo> describeKeyPairs(List<String> keyIds)
 			throws EC2Exception {
+		return describeKeyPairs(keyIds, null);
+	}
+
+	/**
+	 * Lists public/private keypairs. NOTE: the KeyPairInfo.getMaterial() method will return null
+	 * because this API call doesn't return the keypair material.
+	 * 
+	 * @param keyIds A list of keypairs.
+	 * @param filters map of filters to apply to this request. (fingerprint or key-name currently)
+	 * @return A list of keypair descriptions ({@link KeyPairInfo}).
+	 * @throws EC2Exception wraps checked exceptions
+	 * TODO: need to return request id
+	 */
+	public List<KeyPairInfo> describeKeyPairs(List<String> keyIds, Map<String, List<String>> filters)
+			throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		for (int i=0 ; i<keyIds.size(); i++) {
 			params.put("KeyName."+(i+1), keyIds.get(i));
 		}
+		createFilterParams(params, filters);
+
 		HttpGet method = new HttpGet();
 		DescribeKeyPairsResponse response =
 				makeRequestInt(method, "DescribeKeyPairs", params, DescribeKeyPairsResponse.class);
@@ -1232,6 +1343,28 @@ public class Jec2 extends AWSQueryConnection {
 		if (!response.isReturn()) {
 			throw new EC2Exception("Could not delete keypair : "+keyName+". No reason given.");
 		}
+	}
+
+	/**
+	 * This method imports a pubic key from an RSA key pair that you created.
+	 *
+	 * @param keyName the name you are assigning to this key pair
+	 * @param keyMaterial the public key material
+	 * @return information about the keypair
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public KeyPairInfo importKeyPair(String keyName, String keyMaterial) throws EC2Exception {
+        Map<String, String> params = new HashMap<String, String>();
+
+        params.put("KeyName", keyName);
+        params.put("PublicKeyMaterial", new String(Base64.encodeBase64(keyMaterial.getBytes())));
+
+		HttpGet method = new HttpGet();
+		ImportKeyPairResponse response =
+				makeRequestInt(method, "ImportKeyPair", params, ImportKeyPairResponse.class);
+
+
+		return new KeyPairInfo(keyName, response.getKeyFingerprint(), keyMaterial);
 	}
 
 	/**
@@ -1411,12 +1544,26 @@ public class Jec2 extends AWSQueryConnection {
 	 * @throws EC2Exception wraps checked exceptions
 	 */
 	public List<AvailabilityZone> describeAvailabilityZones(List<String> zones) throws EC2Exception {
+		return describeAvailabilityZones(zones, null);
+	}
+
+	/**
+	 * Returns a list of availability zones and their status.
+	 *
+	 * @param zones a list of zones to limit the results, or null
+	 * @param filters map of filters to apply to this request. (fingerprint or key-name currently)
+	 * @return a list of zones and their availability
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<AvailabilityZone> describeAvailabilityZones(List<String> zones, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		if (zones != null && zones.size() > 0)  {
 			for (int i=0 ; i<zones.size(); i++) {
 				params.put("ZoneName."+(i+1), zones.get(i));
 			}
 		}
+		createFilterParams(params, filters);
+
 		HttpGet method = new HttpGet();
 		DescribeAvailabilityZonesResponse response =
 				makeRequestInt(method, "DescribeAvailabilityZones", params, DescribeAvailabilityZonesResponse.class);
@@ -1442,12 +1589,26 @@ public class Jec2 extends AWSQueryConnection {
 	 * @throws EC2Exception wraps checked exceptions
 	 */
 	public List<AddressInfo> describeAddresses(List<String> addresses) throws EC2Exception {
+		return describeAddresses(addresses, null);
+	}
+
+	/**
+	 * Returns a list of addresses associated with this account.
+	 *
+	 * @param addresses a list of zones to limit the results, or null
+	 * @param filters map of filters to apply to this request. (fingerprint or key-name currently)
+	 * @return a list of addresses and their associated instance
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<AddressInfo> describeAddresses(List<String> addresses, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		if (addresses != null && addresses.size() > 0)  {
 			for (int i=0 ; i<addresses.size(); i++) {
 				params.put("PublicIp."+(i+1), addresses.get(i));
 			}
 		}
+		createFilterParams(params, filters);
+
 		HttpGet method = new HttpGet();
 		DescribeAddressesResponse response =
 				makeRequestInt(method, "DescribeAddresses", params, DescribeAddressesResponse.class);
@@ -1552,7 +1713,7 @@ public class Jec2 extends AWSQueryConnection {
 				makeRequestInt(method, "CreateVolume", params, CreateVolumeResponse.class);
 		return new VolumeInfo(response.getVolumeId(), response.getSize(),
 							response.getSnapshotId(), response.getAvailabilityZone(), response.getStatus(),
-							response.getCreateTime().toGregorianCalendar());
+							response.getCreateTime().toGregorianCalendar(), null);
 	}
 
 	/**
@@ -1599,10 +1760,27 @@ public class Jec2 extends AWSQueryConnection {
 	 * @throws EC2Exception wraps checked exceptions
 	 */
 	public List<VolumeInfo> describeVolumes(List<String> volumeIds) throws EC2Exception {
+		return describeVolumes(volumeIds, null);
+	}
+
+	/**
+	 * Gets a list of EBS volumes for this account.
+	 * <p>
+	 * If the list of volume IDs is empty then a list of all volumes owned
+	 * by the caller will be returned. Otherwise the list will contain
+	 * information for the requested volumes only.
+	 * 
+	 * @param volumeIds A list of volumes ({@link com.xerox.amazonws.ec2.VolumeInfo}.
+	 * @param filters map of filters to apply to this request. (fingerprint or key-name currently)
+	 * @return A list of {@link com.xerox.amazonws.ec2.VolumeInfo} volumes.
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<VolumeInfo> describeVolumes(List<String> volumeIds, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		for (int i=0 ; i<volumeIds.size(); i++) {
 			params.put("VolumeId."+(i+1), volumeIds.get(i));
 		}
+		createFilterParams(params, filters);
 		HttpGet method = new HttpGet();
 		DescribeVolumesResponse response =
 				makeRequestInt(method, "DescribeVolumes", params, DescribeVolumesResponse.class);
@@ -1613,7 +1791,7 @@ public class Jec2 extends AWSQueryConnection {
 			DescribeVolumesSetItemResponseType item = (DescribeVolumesSetItemResponseType) reservations_iter.next();
 			VolumeInfo vol = new VolumeInfo(item.getVolumeId(), item.getSize(),
 								item.getSnapshotId(), item.getAvailabilityZone(), item.getStatus(),
-								item.getCreateTime().toGregorianCalendar());
+								item.getCreateTime().toGregorianCalendar(), getTagSet(item.getTagSet()));
 			AttachmentSetResponseType set = item.getAttachmentSet();
 			Iterator attachments_iter = set.getItems().iterator();
 			while (attachments_iter.hasNext()) {
@@ -1698,7 +1876,7 @@ public class Jec2 extends AWSQueryConnection {
 							response.getStartTime().toGregorianCalendar(),
 							response.getProgress(), response.getOwnerId(),
 							response.getVolumeSize(), response.getDescription(),
-							null);
+							null, null);
 	}
 
 	/**
@@ -1763,6 +1941,25 @@ public class Jec2 extends AWSQueryConnection {
 	 */
 	public List<SnapshotInfo> describeSnapshots(List<String> snapshotIds,
 							String owner, String restorableBy) throws EC2Exception {
+		return describeSnapshots(snapshotIds, owner, restorableBy, null);
+	}
+
+	/**
+	 * Gets a list of EBS snapshots for this account.
+	 * <p>
+	 * If the list of snapshot IDs is empty then a list of all snapshots owned
+	 * by the caller will be returned. Otherwise the list will contain
+	 * information for the requested snapshots only.
+	 * 
+	 * @param snapshotIds A list of snapshots ({@link com.xerox.amazonws.ec2.SnapshotInfo}.
+	 * @param owner limits results to snapshots owned by this user
+	 * @param restorableBy limits results to account that can create volumes from this snapshot
+	 * @param filters map of filters to apply to this request. (fingerprint or key-name currently)
+	 * @return A list of {@link com.xerox.amazonws.ec2.VolumeInfo} volumes.
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<SnapshotInfo> describeSnapshots(List<String> snapshotIds,
+							String owner, String restorableBy, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		for (int i=0 ; i<snapshotIds.size(); i++) {
 			params.put("SnapshotId."+(i+1), snapshotIds.get(i));
@@ -1773,6 +1970,7 @@ public class Jec2 extends AWSQueryConnection {
 		if (restorableBy != null) {
 			params.put("RestorableBy", owner);
 		}
+		createFilterParams(params, filters);
 		HttpGet method = new HttpGet();
 		DescribeSnapshotsResponse response =
 				makeRequestInt(method, "DescribeSnapshots", params, DescribeSnapshotsResponse.class);
@@ -1786,7 +1984,7 @@ public class Jec2 extends AWSQueryConnection {
 								item.getStartTime().toGregorianCalendar(),
 								item.getProgress(), item.getOwnerId(),
 								item.getVolumeSize(), item.getDescription(),
-								item.getOwnerAlias());
+								item.getOwnerAlias(), getTagSet(item.getTagSet()));
 			result.add(vol);
 		}
 		return result;
@@ -1878,12 +2076,25 @@ public class Jec2 extends AWSQueryConnection {
 	 * @throws EC2Exception wraps checked exceptions
 	 */
 	public List<RegionInfo> describeRegions(List<String> regions) throws EC2Exception {
+		return describeRegions(regions, null);
+	}
+
+	/**
+	 * Returns a list of regions
+	 *
+	 * @param regions a list of regions to limit the results, or null
+	 * @param filters map of filters to apply to this request. (fingerprint or key-name currently)
+	 * @return a list of regions and endpoints
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<RegionInfo> describeRegions(List<String> regions, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		if (regions != null && regions.size() > 0)  {
 			for (int i=0 ; i<regions.size(); i++) {
 				params.put("Region."+(i+1), regions.get(i));
 			}
 		}
+		createFilterParams(params, filters);
 		HttpGet method = new HttpGet();
 		DescribeRegionsResponse response =
 				makeRequestInt(method, "DescribeRegions", params, DescribeRegionsResponse.class);
@@ -1984,10 +2195,23 @@ public class Jec2 extends AWSQueryConnection {
 	 * @throws EC2Exception wraps checked exceptions
 	 */
 	public List<BundleInstanceInfo> describeBundleTasks(List<String> bundleIds) throws EC2Exception {
+		return describeBundleTasks(bundleIds, null);
+	}
+
+	/**
+	 * Returns a list of current bundling tasks. An empty list causes all tasks to be returned.
+	 *
+	 * @param bundleIds the Ids of the bundle task to describe
+	 * @param filters map of filters to apply to this request. (fingerprint or key-name currently)
+	 * @return information about the cancelled task
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<BundleInstanceInfo> describeBundleTasks(List<String> bundleIds, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		for (int i=0 ; i<bundleIds.size(); i++) {
 			params.put("BundleId."+(i+1), bundleIds.get(i));
 		}
+		createFilterParams(params, filters);
 		HttpGet method = new HttpGet();
 		DescribeBundleTasksResponse response =
 				makeRequestInt(method, "DescribeBundleTasks", params, DescribeBundleTasksResponse.class);
@@ -2004,18 +2228,30 @@ public class Jec2 extends AWSQueryConnection {
 	}
 
 	/**
-	 * Returns a list of Reserved Instance offerings that are available for purchase.
+	 * Returns a list of Reserved Instance that are available for purchase.
 	 *
 	 * @param instanceIds specific reserved instance offering ids to return
 	 * @throws EC2Exception wraps checked exceptions
 	 */
 	public List<ReservedInstances> describeReservedInstances(List<String> instanceIds) throws EC2Exception {
+		return describeReservedInstances(instanceIds, null);
+	}
+
+	/**
+	 * Returns a list of Reserved Instance that are available for purchase.
+	 *
+	 * @param instanceIds specific reserved instance offering ids to return
+	 * @param filters map of filters to apply to this request. (fingerprint or key-name currently)
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<ReservedInstances> describeReservedInstances(List<String> instanceIds, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		if (instanceIds != null) {
 			for (int i=0 ; i<instanceIds.size(); i++) {
 				params.put("ReservedInstanceId."+(i+1), instanceIds.get(i));
 			}
 		}
+		createFilterParams(params, filters);
 		HttpGet method = new HttpGet();
 		DescribeReservedInstancesResponse response =
 				makeRequestInt(method, "DescribeReservedInstances", params, DescribeReservedInstancesResponse.class);
@@ -2029,7 +2265,8 @@ public class Jec2 extends AWSQueryConnection {
 						type.getAvailabilityZone(), type.getStart().toGregorianCalendar(),
 						type.getDuration(), type.getFixedPrice(), type.getUsagePrice(),
 						type.getProductDescription(),
-						type.getInstanceCount().intValue(), type.getState()));
+						type.getInstanceCount().intValue(), type.getState(),
+						getTagSet(type.getTagSet())));
 		}
 		return ret;
 	}
@@ -2047,6 +2284,24 @@ public class Jec2 extends AWSQueryConnection {
 	public List<ProductDescription> describeReservedInstancesOfferings(List<String> offeringIds,
 								InstanceType instanceType, String availabilityZone,
 								String productDescription) throws EC2Exception {
+		return describeReservedInstancesOfferings(offeringIds, instanceType, availabilityZone,
+		                                          productDescription, null);
+	}
+
+	/**
+	 * Returns a list of Reserved Instance offerings that are available for purchase.
+	 *
+	 * @param offeringIds specific reserved instance offering ids to return
+	 * @param instanceType the type of instance offering to be returned
+	 * @param availabilityZone the availability zone to get offerings for
+	 * @param productDescription limit results to those with a matching product description
+	 * @param filters map of filters to apply to this request. (fingerprint or key-name currently)
+	 * @return a list of product descriptions
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<ProductDescription> describeReservedInstancesOfferings(List<String> offeringIds,
+								InstanceType instanceType, String availabilityZone,
+								String productDescription, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		if (offeringIds != null) {
 			for (int i=0 ; i<offeringIds.size(); i++) {
@@ -2062,6 +2317,7 @@ public class Jec2 extends AWSQueryConnection {
 		if (productDescription != null) {
 			params.put("ProductDescription", productDescription);
 		}
+		createFilterParams(params, filters);
 		HttpGet method = new HttpGet();
 		DescribeReservedInstancesOfferingsResponse response =
 				makeRequestInt(method, "DescribeReservedInstancesOfferings", params, DescribeReservedInstancesOfferingsResponse.class);
@@ -2074,7 +2330,7 @@ public class Jec2 extends AWSQueryConnection {
 						InstanceType.getTypeFromString(type.getInstanceType()),
 						type.getAvailabilityZone(),
 						type.getDuration(), type.getFixedPrice(), type.getUsagePrice(),
-						type.getProductDescription()));
+						type.getProductDescription(), null));
 		}
 		return ret;
 	}
@@ -2146,6 +2402,14 @@ public class Jec2 extends AWSQueryConnection {
 	}
     
     public List<SpotPriceHistoryItem> describeSpotPriceHistory(Calendar start, Calendar end, String productDescription, InstanceType... instanceTypes) throws EC2Exception {
+		List<InstanceType> types = new ArrayList<InstanceType>();
+		for (int i = 0; i < instanceTypes.length; i++) {
+			types.add(instanceTypes[i]);
+		}
+		return describeSpotPriceHistory(start, end, productDescription, types, null);
+	}
+
+    public List<SpotPriceHistoryItem> describeSpotPriceHistory(Calendar start, Calendar end, String productDescription, List<InstanceType> instanceTypes, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		if (start != null) {
 			params.put("StartTime", httpDate(start));
@@ -2156,11 +2420,14 @@ public class Jec2 extends AWSQueryConnection {
 		if (productDescription != null) {
 			params.put("ProductDescription", productDescription);
 		}
-		for (int i = 0; i < instanceTypes.length; i++) {
-			InstanceType instanceType = instanceTypes[i];
-			params.put("InstanceType." + (i + 1), instanceType.getTypeId());
+		if (instanceTypes != null) {
+			int i=0;
+			for (InstanceType type: instanceTypes) {
+				params.put("InstanceType." + (i + 1), type.getTypeId());
+				i++;
+			}
 		}
-
+		createFilterParams(params, filters);
 		HttpGet method = new HttpGet();
 		List<SpotPriceHistoryItem> ret = new ArrayList<SpotPriceHistoryItem>();
 		DescribeSpotPriceHistoryResponse response =
@@ -2177,6 +2444,17 @@ public class Jec2 extends AWSQueryConnection {
 	}
 
     public List<SpotInstanceRequest> describeSpotInstanceRequests() throws EC2Exception {
+		return describeSpotInstanceRequests(null, null);
+	}
+
+    public List<SpotInstanceRequest> describeSpotInstanceRequests(List<String> requestIds, Map<String, List<String>> filters) throws EC2Exception {
+		Map<String, String> params = new HashMap<String, String>();
+		if (requestIds != null) {
+			for (int i=0 ; i<requestIds.size(); i++) {
+				params.put("SpotInstanceRequestId."+(i+1), requestIds.get(i));
+			}
+		}
+		createFilterParams(params, filters);
 		HttpGet method = new HttpGet();
 		List<SpotInstanceRequest> ret = new ArrayList<SpotInstanceRequest>();
 		DescribeSpotInstanceRequestsResponse response =
@@ -2185,7 +2463,7 @@ public class Jec2 extends AWSQueryConnection {
 		List<SpotInstanceRequestSetItemType> items = response.getSpotInstanceRequestSet().getItems();
 		if (items != null) {
 			for (SpotInstanceRequestSetItemType item : items) {
-				ret.add(new SpotInstanceRequest(item));
+				ret.add(new SpotInstanceRequest(item, getTagSet(item.getTagSet())));
 			}
 		}
 		return ret;
@@ -2204,7 +2482,7 @@ public class Jec2 extends AWSQueryConnection {
 		List<SpotInstanceRequestSetItemType> items = response.getSpotInstanceRequestSet().getItems();
 		if (items != null) {
 			for (SpotInstanceRequestSetItemType item : items) {
-				ret.add(new SpotInstanceRequest(item));
+				ret.add(new SpotInstanceRequest(item, null));
 			}
 		}
 
@@ -2332,10 +2610,23 @@ public class Jec2 extends AWSQueryConnection {
 	 * @throws EC2Exception wraps checked exceptions
 	 */
 	public List<PlacementGroupInfo> describePlacementGroups(List<String> groupNames) throws EC2Exception {
+		return describePlacementGroups(groupNames, null);
+	}
+
+	/**
+	 * This method describes the placement groups.
+	 *
+	 * @param groupNames names of 1 or more groups to get information about, null for all groups
+	 * @param filters map of filters to apply to this request. (fingerprint or key-name currently)
+	 * @return information about the groups
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<PlacementGroupInfo> describePlacementGroups(List<String> groupNames, Map<String, List<String>> filters) throws EC2Exception {
 		Map<String, String> params = new HashMap<String, String>();
 		for (int i=0 ; i<groupNames.size(); i++) {
 			params.put("GroupName."+(i+1), groupNames.get(i));
 		}
+		createFilterParams(params, filters);
 		HttpGet method = new HttpGet();
         DescribePlacementGroupsResponse response =
 				makeRequestInt(method, "DescribePlacementGroups", params, DescribePlacementGroupsResponse.class);
@@ -2346,6 +2637,124 @@ public class Jec2 extends AWSQueryConnection {
 			for (PlacementGroupInfoType item : items) {
 				ret.add(new PlacementGroupInfo(response.getRequestId(), item.getGroupName(),
 									item.getStrategy(), item.getState()));
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 * Adds or overwites one or more tags for the specified resource or resources. 10 tags max
+	 * per resource.
+	 *
+	 * @param resourceIds 1 or more resource ids
+	 * @param tagSet set of tags to assign to the resource(s)
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public void createTags(List<String> resourceIds, Map<String, String> tagSet) throws EC2Exception {
+		Map<String, String> params = new HashMap<String, String>();
+		for (int i=0 ; i<resourceIds.size(); i++) {
+			params.put("ResourceId."+(i+1), resourceIds.get(i));
+		}
+		int i=1;
+		for (String key : tagSet.keySet()) {
+			String val = tagSet.get(key);
+			if (val != null && val.length() > 0) {
+				params.put("Tag."+i+".Key", key);
+				params.put("Tag."+i+".Value", val);
+				i++;
+			}
+		}
+		HttpGet method = new HttpGet();
+		CreateTagsResponse response =
+				makeRequestInt(method, "CreateTags", params, CreateTagsResponse.class);
+		if (!response.isReturn()) {
+			throw new EC2Exception("Could not create tags (no reason given).");
+		}
+	}
+
+	/**
+	 * Deletes the specified tag(s) from the specified resource(s)
+	 *
+	 * @param resourceIds 1 or more resource ids
+	 * @param tagSet set of tags to assign to the resource(s)
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public void deleteTags(List<String> resourceIds, Map<String, String> tagSet) throws EC2Exception {
+		Map<String, String> params = new HashMap<String, String>();
+		for (int i=0 ; i<resourceIds.size(); i++) {
+			params.put("ResourceId."+(i+1), resourceIds.get(i));
+		}
+		int i=1;
+		for (String key : tagSet.keySet()) {
+			String val = tagSet.get(key);
+			if (val != null && val.length() > 0) {
+				params.put("Tag."+i+".Key", key);
+				params.put("Tag."+i+".Value", val);
+				i++;
+			}
+		}
+		HttpGet method = new HttpGet();
+		DeleteTagsResponse response =
+				makeRequestInt(method, "DeleteTags", params, DeleteTagsResponse.class);
+		if (!response.isReturn()) {
+			throw new EC2Exception("Could not delete tags (no reason given).");
+		}
+	}
+
+	/**
+	 * Gets a list of your tags with optional filtering to limit the results.
+	 * 
+	 * @param filters map of filters to apply to this request. (fingerprint or key-name currently)
+	 * @return A map of tag values
+	 * @throws EC2Exception wraps checked exceptions
+	 */
+	public List<TagInfo> describeTags(Map<String, List<String>> filters) throws EC2Exception {
+		Map<String, String> params = new HashMap<String, String>();
+		createFilterParams(params, filters);
+		HttpGet method = new HttpGet();
+		DescribeTagsResponse response =
+				makeRequestInt(method, "DescribeTags", params, DescribeTagsResponse.class);
+		List<TagInfo> ret = new ArrayList<TagInfo>();
+		TagSetType res_set = response.getTagSet();
+		Iterator tags_iter = res_set.getItems().iterator();
+		while (tags_iter.hasNext()) {
+			TagSetItemType item = (TagSetItemType) tags_iter.next();
+			ret.add(new TagInfo(item.getResourceId(), item.getResourceType(),
+			                    item.getKey(), item.getValue()));
+		}
+		return ret;
+	}
+
+	// helper method to create common filter parameters
+	protected void createFilterParams(Map<String, String> params, Map<String, List<String>> filters) {
+		if (params == null) throw new IllegalArgumentException("params must always be non-null");
+		if (filters == null) return;
+		int i=1;
+		for (String key : filters.keySet()) {
+			List<String> vals = filters.get(key);
+			if (vals != null && vals.size() > 0) {
+				params.put("Filter."+i+".Name", key);
+				Iterator<String> iter = vals.iterator();
+				int j=1;
+				while (iter.hasNext()) {
+					String val = iter.next();
+					params.put("Filter."+i+".Value."+j, val);
+					j++;
+				}
+				i++;
+			}
+		}
+	}
+
+	// helper method to construct tag set objects from results
+	protected Map<String, String> getTagSet(ResourceTagSetType setType) {
+		Map<String, String> ret = new HashMap<String, String>();
+		if (setType == null) return ret;
+
+		List<ResourceTagSetItemType> tagList = setType.getItems();
+		if (tagList != null) {
+			for (ResourceTagSetItemType tag : tagList) {
+				ret.put(tag.getKey(), tag.getValue());
 			}
 		}
 		return ret;

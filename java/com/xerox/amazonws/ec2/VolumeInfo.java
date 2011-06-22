@@ -20,6 +20,7 @@ package com.xerox.amazonws.ec2;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An instance of this class represents an EC2 Volume.
@@ -37,15 +38,17 @@ public class VolumeInfo {
 	private String status;
 	private Calendar createTime;
 	private List<AttachmentInfo> attachmentSets = new ArrayList<AttachmentInfo>();
+	private Map<String, String> tagSet;
 
 	public VolumeInfo(String volumeId, String size, String snapshotId, String zone,
-			String status, Calendar createTime) {
+			String status, Calendar createTime, Map<String, String> tagSet) {
 		this.volumeId = volumeId;
 		this.size = size;
 		this.snapshotId = snapshotId;
 		this.zone = zone;
 		this.status = status;
 		this.createTime = createTime;
+		this.tagSet = tagSet;
 	}
 
 	public String getVolumeId() {
@@ -82,6 +85,10 @@ public class VolumeInfo {
 
 	public List<AttachmentInfo> getAttachmentInfo() {
 		return attachmentSets;
+	}
+
+	public Map<String, String> getTagSet() {
+		return tagSet;
 	}
 
 	public String toString() {

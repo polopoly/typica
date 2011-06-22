@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-		   xmlns:tns="http://ec2.amazonaws.com/doc/2010-06-15/"
-		   targetNamespace="http://ec2.amazonaws.com/doc/2010-06-15/"
+           xmlns:tns="http://ec2.amazonaws.com/doc/2010-11-15/"
+           targetNamespace="http://ec2.amazonaws.com/doc/2010-11-15/"
 		   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	 	   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
 	 	   xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
@@ -93,6 +93,21 @@
 	  <xs:element name="keyMaterial" type="xs:string"/>
 	</xs:sequence>
   </xs:complexType>
+  <xs:element name="ImportKeyPair" type="tns:ImportKeyPairType"/>
+  <xs:element name="ImportKeyPairResponse" type="tns:ImportKeyPairResponseType"/>
+  <xs:complexType name="ImportKeyPairType">
+	<xs:sequence>
+	  <xs:element name="keyName" type="xs:string"/>
+	  <xs:element name="publicKeyMaterial" type="xs:string"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ImportKeyPairResponseType">
+	<xs:sequence>
+	  <xs:element name="requestId" type="xs:string"/>
+	  <xs:element name="keyName" type="xs:string"/>
+	  <xs:element name="keyFingerprint" type="xs:string"/>
+	</xs:sequence>
+  </xs:complexType>
   <xs:element name="DeleteKeyPair" type="tns:DeleteKeyPairType"/>
   <xs:complexType name="DeleteKeyPairType">
 	<xs:sequence>
@@ -110,6 +125,7 @@
   <xs:complexType name="DescribeKeyPairsType">
 	<xs:sequence>
 	  <xs:element name="keySet" type="tns:DescribeKeyPairsInfoType"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeKeyPairsInfoType">
@@ -149,19 +165,20 @@
 	  <xs:element name="keyName" type="xs:string" minOccurs="0"/>
 	  <xs:element name="groupSet" type="tns:GroupSetType"/>
 	  <xs:element name="additionalInfo" type="xs:string" minOccurs="0"/>
-	  <xs:element name="userData" type="tns:UserDataType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="addressingType" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="userData" type="tns:UserDataType" minOccurs="0"/>
+	  <xs:element name="addressingType" type="xs:string" minOccurs="0"/>
 	  <xs:element name="instanceType" type="xs:string"/>
-	  <xs:element name="placement" type="tns:PlacementRequestType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="kernelId" type="xs:string" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="ramdiskId" type="xs:string" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="blockDeviceMapping" type="tns:BlockDeviceMappingType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="monitoring" type="tns:MonitoringInstanceType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="subnetId" type="xs:string" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="disableApiTermination" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="instanceInitiatedShutdownBehavior" type="xs:string" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="license" type="tns:InstanceLicenseRequestType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="privateIpAddress" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="placement" type="tns:PlacementRequestType" minOccurs="0"/>
+	  <xs:element name="kernelId" type="xs:string" minOccurs="0"/>
+	  <xs:element name="ramdiskId" type="xs:string" minOccurs="0"/>
+	  <xs:element name="blockDeviceMapping" type="tns:BlockDeviceMappingType" minOccurs="0"/>
+	  <xs:element name="monitoring" type="tns:MonitoringInstanceType" minOccurs="0"/>
+	  <xs:element name="subnetId" type="xs:string" minOccurs="0"/>
+	  <xs:element name="disableApiTermination" type="xs:boolean" minOccurs="0"/>
+	  <xs:element name="instanceInitiatedShutdownBehavior" type="xs:string" minOccurs="0"/>
+	  <xs:element name="license" type="tns:InstanceLicenseRequestType" minOccurs="0"/>
+	  <xs:element name="privateIpAddress" type="xs:string" minOccurs="0"/>
+	  <xs:element name="clientToken" type="xs:string" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="GroupSetType">
@@ -205,18 +222,24 @@
   </xs:complexType>
   <xs:complexType name="PlacementRequestType">
 	<xs:sequence>
+	  <xs:element name="availabilityZone" type="xs:string" minOccurs="0"/>
+	  <xs:element name="groupName" type="xs:string" minOccurs="0"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="InstancePlacementType">
+	<xs:sequence>
 	  <xs:element name="availabilityZone" type="xs:string" minOccurs="0" maxOccurs="1"/>
 	  <xs:element name="groupName" type="xs:string" minOccurs="0" maxOccurs="1"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="MonitoringInstanceType">
 	<xs:sequence>
-	  <xs:element name="enabled" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="enabled" type="xs:boolean" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="InstanceLicenseRequestType">
 	<xs:sequence>
-	  <xs:element name="pool" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="pool" type="xs:string"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:element name="RunInstancesResponse" type="tns:RunInstancesResponseType"/>
@@ -241,7 +264,7 @@
   </xs:complexType>
   <xs:complexType name="RunningInstancesSetType">
 	<xs:sequence>
-	  <xs:element name="item" type="tns:RunningInstancesItemType" minOccurs="1" maxOccurs="unbounded"/>
+	  <xs:element name="item" type="tns:RunningInstancesItemType" maxOccurs="unbounded"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="RunningInstancesItemType">
@@ -253,19 +276,19 @@
 	  <xs:element name="dnsName" type="xs:string" minOccurs="0"/>
 	  <xs:element name="reason" type="xs:string" minOccurs="0"/>
 	  <xs:element name="keyName" type="xs:string" minOccurs="0"/>
-	  <xs:element name="amiLaunchIndex" type="xs:string" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="productCodes" type="tns:ProductCodesSetType" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="amiLaunchIndex" type="xs:string" minOccurs="0"/>
+	  <xs:element name="productCodes" type="tns:ProductCodesSetType" minOccurs="0"/>
 	  <xs:element name="instanceType" type="xs:string"/>
 	  <xs:element name="launchTime" type="xs:dateTime"/>
 	  <xs:element name="placement" type="tns:PlacementResponseType" minOccurs="0"/>
 	  <xs:element name="kernelId" type="xs:string" minOccurs="0"/>
 	  <xs:element name="ramdiskId" type="xs:string" minOccurs="0"/>
 	  <xs:element name="platform" type="xs:string" minOccurs="0"/>
-	  <xs:element name="monitoring" type="tns:InstanceMonitoringStateType" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="monitoring" type="tns:InstanceMonitoringStateType" minOccurs="0"/>
 	  <xs:element name="subnetId" type="xs:string" minOccurs="0"/>
 	  <xs:element name="vpcId" type="xs:string" minOccurs="0"/>
-	  <xs:element name="privateIpAddress" type="xs:string" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="ipAddress" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="privateIpAddress" type="xs:string" minOccurs="0"/>
+	  <xs:element name="ipAddress" type="xs:string" minOccurs="0"/>
 	  <xs:element name="stateReason" type="tns:StateReasonType" minOccurs="0"/>
 	  <xs:element name="architecture" type="xs:string" minOccurs="0"/>
 	  <xs:element name="rootDeviceType" type="xs:string" minOccurs="0"/>
@@ -273,14 +296,17 @@
 	  <xs:element name="blockDeviceMapping" type="tns:InstanceBlockDeviceMappingResponseType" minOccurs="0"/>
 	  <xs:element name="instanceLifecycle" type="xs:string" minOccurs="0"/>
 	  <xs:element name="spotInstanceRequestId" type="xs:string" minOccurs="0"/>
-	  <xs:element name="license" type="tns:InstanceLicenseResponseType" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="license" type="tns:InstanceLicenseResponseType" minOccurs="0"/>
 	  <xs:element name="virtualizationType" type="xs:string" minOccurs="0"/>
+	  <xs:element name="clientToken" type="xs:string" minOccurs="0"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
+	  <xs:element name="hypervisor" type="xs:string" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="PlacementResponseType">
 	<xs:sequence>
 	  <xs:element name="availabilityZone" type="xs:string"/>
-	  <xs:element name="groupName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="groupName" type="xs:string" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="StateReasonType">
@@ -312,7 +338,7 @@
   </xs:complexType>
   <xs:complexType name="InstanceLicenseResponseType">
 	<xs:sequence>
-	  <xs:element name="pool" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="pool" type="xs:string"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:element name="GetConsoleOutput" type="tns:GetConsoleOutputType"/>
@@ -455,6 +481,7 @@
   <xs:complexType name="DescribeInstancesType">
 	<xs:sequence>
 	  <xs:element name="instancesSet" type="tns:DescribeInstancesInfoType"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeInstancesInfoType">
@@ -485,6 +512,7 @@
 	  <xs:element name="executableBySet" type="tns:DescribeImagesExecutableBySetType" minOccurs="0"/>
 	  <xs:element name="imagesSet" type="tns:DescribeImagesInfoType"/>
 	  <xs:element name="ownersSet" type="tns:DescribeImagesOwnersType" minOccurs="0"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeImagesInfoType">
@@ -550,6 +578,8 @@
 	  <xs:element name="rootDeviceName" type="xs:string" minOccurs="0"/>
 	  <xs:element name="blockDeviceMapping" type="tns:BlockDeviceMappingType" minOccurs="0"/>
 	  <xs:element name="virtualizationType" type="xs:string" minOccurs="0"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
+	  <xs:element name="hypervisor" type="xs:string" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:element name="CreateSecurityGroup" type="tns:CreateSecurityGroupType"/>
@@ -583,6 +613,7 @@
   <xs:complexType name="DescribeSecurityGroupsType">
 	<xs:sequence>
 	  <xs:element name="securityGroupSet" type="tns:DescribeSecurityGroupsSetType"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeSecurityGroupsSetType">
@@ -910,6 +941,7 @@
   <xs:complexType name="DescribeAvailabilityZonesType">
 	<xs:sequence>
 	  <xs:element name="availabilityZoneSet" type="tns:DescribeAvailabilityZonesSetType"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeAvailabilityZonesSetType">
@@ -978,6 +1010,7 @@
   <xs:complexType name="DescribeAddressesType">
 	<xs:sequence>
 	  <xs:element name="publicIpsSet" type="tns:DescribeAddressesInfoType"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeAddressesInfoType">
@@ -1072,6 +1105,7 @@
   <xs:complexType name="DescribeVolumesType">
 	<xs:sequence>
 	  <xs:element name="volumeSet" type="tns:DescribeVolumesSetType"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeVolumesSetType">
@@ -1105,6 +1139,7 @@
 	  <xs:element name="status" type="xs:string"/>
 	  <xs:element name="createTime" type="xs:dateTime"/>
 	  <xs:element name="attachmentSet" type="tns:AttachmentSetResponseType"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="AttachmentSetResponseType">
@@ -1145,9 +1180,9 @@
   <xs:complexType name="DetachVolumeType">
 	<xs:sequence>
 	  <xs:element name="volumeId" type="xs:string"/>
-	  <xs:element name="instanceId" type="xs:string" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="device" type="xs:string" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="force" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="instanceId" type="xs:string" minOccurs="0"/>
+	  <xs:element name="device" type="xs:string" minOccurs="0"/>
+	  <xs:element name="force" type="xs:boolean" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:element name="DetachVolumeResponse" type="tns:DetachVolumeResponseType"/>
@@ -1201,6 +1236,7 @@
 	  <xs:element name="snapshotSet" type="tns:DescribeSnapshotsSetType"/>
 	  <xs:element name="ownersSet" type="tns:DescribeSnapshotsOwnersType" minOccurs="0"/>
 	  <xs:element name="restorableBySet" type="tns:DescribeSnapshotsRestorableBySetType" minOccurs="0"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeSnapshotsSetType">
@@ -1256,6 +1292,7 @@
 	  <xs:element name="volumeSize" type="xs:string"/>
 	  <xs:element name="description" type="xs:string" minOccurs="0"/>
 	  <xs:element name="ownerAlias" type="xs:string" minOccurs="0"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:element name="ModifySnapshotAttribute" type="tns:ModifySnapshotAttributeType"/>
@@ -1378,6 +1415,7 @@
   <xs:complexType name="DescribeBundleTasksType">
 	<xs:sequence>
 	  <xs:element name="bundlesSet" type="tns:DescribeBundleTasksInfoType"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeBundleTasksInfoType">
@@ -1419,6 +1457,7 @@
   <xs:complexType name="DescribeRegionsType">
 	<xs:sequence>
 	  <xs:element name="regionSet" type="tns:DescribeRegionsSetType"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeRegionsSetType">
@@ -1456,6 +1495,7 @@
 	  <xs:element name="instanceType" type="xs:string" minOccurs="0"/>
 	  <xs:element name="availabilityZone" type="xs:string" minOccurs="0"/>
 	  <xs:element name="productDescription" type="xs:string" minOccurs="0"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeReservedInstancesOfferingsSetType">
@@ -1509,6 +1549,7 @@
   <xs:complexType name="DescribeReservedInstancesType">
 	<xs:sequence>
 	  <xs:element name="reservedInstancesSet" type="tns:DescribeReservedInstancesSetType" minOccurs="0"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeReservedInstancesSetType">
@@ -1545,6 +1586,7 @@
 	  <xs:element name="instanceCount" type="xs:integer"/>
 	  <xs:element name="productDescription" type="xs:string"/>
 	  <xs:element name="state" type="xs:string"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:element name="MonitorInstances" type="tns:MonitorInstancesType"/>
@@ -1606,6 +1648,7 @@
 	  <xs:element name="type" type="xs:string"/>
 	  <xs:element name="availabilityZone" type="xs:string"/>
 	  <xs:element name="attachments" type="tns:AttachmentSetType"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="CustomerGatewayType">
@@ -1615,6 +1658,7 @@
 	  <xs:element name="type" type="xs:string"/>
 	  <xs:element name="ipAddress" type="xs:string"/>
 	  <xs:element name="bgpAsn" type="xs:int"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="VpnConnectionType">
@@ -1625,6 +1669,7 @@
 	  <xs:element name="type" type="xs:string" minOccurs="0"/>
 	  <xs:element name="customerGatewayId" type="xs:string"/>
 	  <xs:element name="vpnGatewayId" type="xs:string"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="VpcType">
@@ -1633,6 +1678,7 @@
 	  <xs:element name="state" type="xs:string" minOccurs="0"/>
 	  <xs:element name="cidrBlock" type="xs:string" minOccurs="0"/>
 	  <xs:element name="dhcpOptionsId" type="xs:string" minOccurs="0"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="SubnetType">
@@ -1643,6 +1689,7 @@
 	  <xs:element name="cidrBlock" type="xs:string" minOccurs="0"/>
 	  <xs:element name="availableIpAddressCount" type="xs:int" minOccurs="0"/>
 	  <xs:element name="availabilityZone" type="xs:string" minOccurs="0"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="CustomerGatewaySetType">
@@ -1750,6 +1797,7 @@
 	<xs:sequence>
 	  <xs:element name="dhcpOptionsId" type="xs:string"/>
 	  <xs:element name="dhcpConfigurationSet" type="tns:DhcpConfigurationItemSetType"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DhcpValueType">
@@ -2040,6 +2088,7 @@
   <xs:complexType name="DescribeDhcpOptionsType">
 	<xs:sequence>
 	  <xs:element name="dhcpOptionsSet" type="tns:DhcpOptionsIdSetType" minOccurs="0"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeDhcpOptionsResponseType">
@@ -2102,15 +2151,15 @@
 	  <xs:element name="imageId" type="xs:string"/>
 	  <xs:element name="keyName" type="xs:string" minOccurs="0"/>
 	  <xs:element name="groupSet" type="tns:GroupSetType"/>
-	  <xs:element name="userData" type="tns:UserDataType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="addressingType" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="userData" type="tns:UserDataType" minOccurs="0"/>
+	  <xs:element name="addressingType" type="xs:string" minOccurs="0"/>
 	  <xs:element name="instanceType" type="xs:string"/>
-	  <xs:element name="placement" type="tns:PlacementRequestType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="kernelId" type="xs:string" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="ramdiskId" type="xs:string" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="blockDeviceMapping" type="tns:BlockDeviceMappingType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="monitoring" type="tns:MonitoringInstanceType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="subnetId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="placement" type="tns:PlacementRequestType" minOccurs="0"/>
+	  <xs:element name="kernelId" type="xs:string" minOccurs="0"/>
+	  <xs:element name="ramdiskId" type="xs:string" minOccurs="0"/>
+	  <xs:element name="blockDeviceMapping" type="tns:BlockDeviceMappingType" minOccurs="0"/>
+	  <xs:element name="monitoring" type="tns:MonitoringInstanceType" minOccurs="0"/>
+	  <xs:element name="subnetId" type="xs:string" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="LaunchSpecificationResponseType">
@@ -2118,14 +2167,14 @@
 	  <xs:element name="imageId" type="xs:string"/>
 	  <xs:element name="keyName" type="xs:string" minOccurs="0"/>
 	  <xs:element name="groupSet" type="tns:GroupSetType"/>
-	  <xs:element name="addressingType" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="addressingType" type="xs:string" minOccurs="0"/>
 	  <xs:element name="instanceType" type="xs:string"/>
-	  <xs:element name="placement" type="tns:PlacementRequestType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="kernelId" type="xs:string" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="ramdiskId" type="xs:string" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="blockDeviceMapping" type="tns:BlockDeviceMappingType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="monitoring" type="tns:MonitoringInstanceType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="subnetId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="placement" type="tns:PlacementRequestType" minOccurs="0"/>
+	  <xs:element name="kernelId" type="xs:string" minOccurs="0"/>
+	  <xs:element name="ramdiskId" type="xs:string" minOccurs="0"/>
+	  <xs:element name="blockDeviceMapping" type="tns:BlockDeviceMappingType" minOccurs="0"/>
+	  <xs:element name="monitoring" type="tns:MonitoringInstanceType" minOccurs="0"/>
+	  <xs:element name="subnetId" type="xs:string" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="SpotInstanceRequestSetItemType">
@@ -2143,6 +2192,7 @@
 	  <xs:element name="instanceId" type="xs:string" minOccurs="0"/>
 	  <xs:element name="createTime" type="xs:dateTime" minOccurs="0"/>
 	  <xs:element name="productDescription" type="xs:string" minOccurs="0"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="SpotInstanceStateFaultType">
@@ -2159,12 +2209,13 @@
   <xs:complexType name="RequestSpotInstancesResponseType">
 	<xs:sequence>
 	  <xs:element name="requestId" type="xs:string"/>
-	  <xs:element name="spotInstanceRequestSet" type="tns:SpotInstanceRequestSetType" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="spotInstanceRequestSet" type="tns:SpotInstanceRequestSetType"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="DescribeSpotInstanceRequestsType">
 	<xs:sequence>
 	  <xs:element name="spotInstanceRequestIdSet" type="tns:SpotInstanceRequestIdSetType"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="SpotInstanceRequestIdSetType">
@@ -2209,8 +2260,9 @@
 	<xs:sequence>
 	  <xs:element name="startTime" type="xs:dateTime" minOccurs="0"/>
 	  <xs:element name="endTime" type="xs:dateTime" minOccurs="0"/>
-	  <xs:element name="instanceTypeSet" type="tns:InstanceTypeSetType" minOccurs="0" maxOccurs="1"/>
-	  <xs:element name="productDescriptionSet" type="tns:ProductDescriptionSetType" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="instanceTypeSet" type="tns:InstanceTypeSetType" minOccurs="0"/>
+	  <xs:element name="productDescriptionSet" type="tns:ProductDescriptionSetType" minOccurs="0"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="InstanceTypeSetType">
@@ -2295,7 +2347,8 @@
   <xs:element name="DeactivateLicenseResponse" type="tns:DeactivateLicenseResponseType"/>
   <xs:complexType name="DescribeLicensesType">
 	<xs:sequence>
-	  <xs:element name="licenseIdSet" type="tns:LicenseIdSetType" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="licenseIdSet" type="tns:LicenseIdSetType" minOccurs="0"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="LicenseIdSetType">
@@ -2325,6 +2378,7 @@
 	  <xs:element name="type" type="xs:string"/>
 	  <xs:element name="pool" type="xs:string"/>
 	  <xs:element name="capacitySet" type="tns:LicenseCapacitySetType"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="LicenseCapacitySetType">
@@ -2337,7 +2391,7 @@
 	  <xs:element name="capacity" type="xs:int"/>
 	  <xs:element name="instanceCapacity" type="xs:int"/>
 	  <xs:element name="state" type="xs:string"/>
-	  <xs:element name="earliestAllowedDeactivationTime" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="earliestAllowedDeactivationTime" type="xs:dateTime" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="ActivateLicenseType">
@@ -2406,6 +2460,7 @@
   <xs:complexType name="DescribePlacementGroupsType">
 	<xs:sequence>
 	  <xs:element name="placementGroupSet" type="tns:DescribePlacementGroupsInfoType"/>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
 	</xs:sequence>
   </xs:complexType>
   <xs:complexType name="PlacementGroupInfoType">
@@ -2424,6 +2479,258 @@
 	<xs:sequence>
 	  <xs:element name="requestId" type="xs:string"/>
 	  <xs:element name="placementGroupSet" type="tns:PlacementGroupSetType"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:element name="CreateTags" type="tns:CreateTagsType"/>
+  <xs:element name="CreateTagsResponse" type="tns:CreateTagsResponseType"/>
+  <xs:element name="DescribeTags" type="tns:DescribeTagsType"/>
+  <xs:element name="DescribeTagsResponse" type="tns:DescribeTagsResponseType"/>
+  <xs:element name="DeleteTags" type="tns:DeleteTagsType"/>
+  <xs:element name="DeleteTagsResponse" type="tns:DeleteTagsResponseType"/>
+  <xs:complexType name="ResourceIdSetType">
+	<xs:sequence>
+	  <xs:element name="item" type="tns:ResourceIdSetItemType" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ResourceIdSetItemType">
+	<xs:sequence>
+	  <xs:element name="resourceId" type="xs:string"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ResourceTagSetItemType">
+	<xs:sequence>
+	  <xs:element name="key" type="xs:string"/>
+	  <xs:element name="value" type="xs:string"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ResourceTagSetType">
+	<xs:sequence>
+	  <xs:element name="item" type="tns:ResourceTagSetItemType" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CreateTagsType">
+	<xs:sequence>
+	  <xs:element name="resourcesSet" type="tns:ResourceIdSetType"/>
+	  <xs:element name="tagSet" type="tns:ResourceTagSetType"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CreateTagsResponseType">
+	<xs:sequence>
+	  <xs:element name="requestId" type="xs:string"/>
+	  <xs:element name="return" type="xs:boolean"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TagSetItemType">
+	<xs:sequence>
+	  <xs:element name="resourceId" type="xs:string" minOccurs="0"/>
+	  <xs:element name="resourceType" type="xs:string" minOccurs="0"/>
+	  <xs:element name="key" type="xs:string" minOccurs="0"/>
+	  <xs:element name="value" type="xs:string" minOccurs="0"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TagSetType">
+	<xs:sequence>
+	  <xs:element name="item" type="tns:TagSetItemType" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DescribeTagsType">
+	<xs:sequence>
+	  <xs:element name="filterSet" type="tns:FilterSetType" minOccurs="0"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DescribeTagsResponseType">
+	<xs:sequence>
+	  <xs:element name="requestId" type="xs:string"/>
+	  <xs:element name="tagSet" type="tns:TagSetType"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DeleteTagsSetItemType">
+	<xs:sequence>
+	  <xs:element name="key" type="xs:string" minOccurs="0"/>
+	  <xs:element name="value" type="xs:string" minOccurs="0"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DeleteTagsSetType">
+	<xs:sequence>
+	  <xs:element name="item" type="tns:DeleteTagsSetItemType" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DeleteTagsType">
+	<xs:sequence>
+	  <xs:element name="resourcesSet" type="tns:ResourceIdSetType"/>
+	  <xs:element name="tagSet" type="tns:DeleteTagsSetType"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DeleteTagsResponseType">
+	<xs:sequence>
+	  <xs:element name="requestId" type="xs:string"/>
+	  <xs:element name="return" type="xs:boolean"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:element name="ImportInstance" type="tns:ImportInstanceType"/>
+  <xs:element name="ImportInstanceResponse" type="tns:ImportInstanceResponseType"/>
+  <xs:complexType name="ImportInstanceType">
+	<xs:sequence>
+	  <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="launchSpecification" type="tns:ImportInstanceLaunchSpecificationType" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="diskImageSet" type="tns:DiskImageSetType" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="platform" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ImportInstanceResponseType">
+	<xs:sequence>
+	  <xs:element name="conversionTask" type="tns:ConversionTaskType" minOccurs="1" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ImportInstanceLaunchSpecificationType">
+	<xs:sequence>
+	  <xs:element name="architecture" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="groupSet" type="tns:GroupSetType" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="userData" type="tns:UserDataType" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="instanceType" type="xs:string"/>
+	  <xs:element name="placement" type="tns:InstancePlacementType" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="monitoring" type="tns:MonitoringInstanceType" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="subnetId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="instanceInitiatedShutdownBehavior" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="privateIpAddress" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DiskImageSetType">
+	<xs:sequence>
+	  <xs:element name="item" type="tns:DiskImageType" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DiskImageType">
+	<xs:sequence>
+	  <xs:element name="image" type="tns:DiskImageDetailType" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="volume" type="tns:DiskImageVolumeType" minOccurs="1" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DiskImageDetailType">
+	<xs:sequence>
+	  <xs:element name="format" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="bytes" type="xs:long" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="importManifestUrl" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DiskImageVolumeType">
+	<xs:sequence>
+	  <xs:element name="size" type="xs:integer"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ConversionTaskType">
+	<xs:sequence>
+	  <xs:element name="conversionTaskId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="expirationTime" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:choice>
+		<xs:element name="importVolume" type="tns:ImportVolumeTaskDetailsType" minOccurs="0" maxOccurs="1"/>
+		<xs:element name="importInstance" type="tns:ImportInstanceTaskDetailsType" minOccurs="0" maxOccurs="1"/>
+	  </xs:choice>
+	  <xs:element name="state" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="statusMessage" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ImportInstanceTaskDetailsType">
+	<xs:sequence>
+	  <xs:element name="volumes" type="tns:ImportInstanceVolumeDetailSetType" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="instanceId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="platform" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ImportVolumeTaskDetailsType">
+	<xs:sequence>
+	  <xs:element name="bytesConverted" type="xs:long" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="availabilityZone" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="image" type="tns:DiskImageDescriptionType" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="volume" type="tns:DiskImageVolumeDescriptionType" minOccurs="1" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ImportInstanceVolumeDetailSetType">
+	<xs:sequence>
+	  <xs:element name="item" type="tns:ImportInstanceVolumeDetailItemType" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ImportInstanceVolumeDetailItemType">
+	<xs:sequence>
+	  <xs:element name="bytesConverted" type="xs:long" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="availabilityZone" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="image" type="tns:DiskImageDescriptionType" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="volume" type="tns:DiskImageVolumeDescriptionType" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="status" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="statusMessage" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DiskImageVolumeDescriptionType">
+	<xs:sequence>
+	  <xs:element name="size" type="xs:integer"/>
+	  <xs:element name="id" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DiskImageDescriptionType">
+	<xs:sequence>
+	  <xs:element name="format" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="size" type="xs:long" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="importManifestUrl" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	  <xs:element name="checksum" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:element name="ImportVolume" type="tns:ImportVolumeType"/>
+  <xs:element name="ImportVolumeResponse" type="tns:ImportVolumeResponseType"/>
+  <xs:complexType name="ImportVolumeType">
+	<xs:sequence>
+	  <xs:element name="availabilityZone" type="xs:string"/>
+	  <xs:element name="image" type="tns:DiskImageDetailType"/>
+	  <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	  <xs:element name="volume" type="tns:DiskImageVolumeType" minOccurs="1" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ImportVolumeResponseType">
+	<xs:sequence>
+	  <xs:element name="conversionTask" type="tns:ConversionTaskType" minOccurs="1" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:element name="DescribeConversionTasks" type="tns:DescribeConversionTasksType"/>
+  <xs:element name="DescribeConversionTasksResponse" type="tns:DescribeConversionTasksResponseType"/>
+  <xs:complexType name="DescribeConversionTasksType">
+	<xs:sequence>
+	  <xs:element name="conversionTaskIdSet" type="tns:ConversionTaskIdSetType" minOccurs="1" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DescribeConversionTasksResponseType">
+	<xs:sequence>
+	  <xs:element name="conversionTasks" type="tns:ConversionTaskSetType" minOccurs="1" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ConversionTaskIdSetType">
+	<xs:sequence>
+	  <xs:element name="item" type="tns:ConversionTaskIdItemType" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ConversionTaskIdItemType">
+	<xs:sequence>
+	  <xs:element name="conversionTaskId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ConversionTaskSetType">
+	<xs:sequence>
+	  <xs:element name="item" type="tns:ConversionTaskType" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:element name="CancelConversionTask" type="tns:CancelConversionTaskType"/>
+  <xs:element name="CancelConversionTaskResponse" type="tns:CancelConversionTaskResponseType"/>
+  <xs:complexType name="CancelConversionTaskType">
+	<xs:sequence>
+	  <xs:element name="conversionTaskId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CancelConversionTaskResponseType">
+	<xs:sequence>
+	  <xs:element name="requestId" type="xs:string"/>
+	  <xs:element name="return" type="xs:boolean"/>
 	</xs:sequence>
   </xs:complexType>
 </xs:schema>

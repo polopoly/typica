@@ -18,6 +18,7 @@
 package com.xerox.amazonws.ec2;
 
 import java.util.Calendar;
+import java.util.Map;
 
 public class ReservedInstances extends ProductDescription {
 	private Calendar start;
@@ -28,9 +29,9 @@ public class ReservedInstances extends ProductDescription {
 						String availabilityZone, Calendar start, long duration,
 						double fixedPrice, double usagePrice,
 						String productDescription, int instanceCount,
-						String state) {
+						String state, Map<String, String> tagSet) {
 		super(reservedInstancesId, instanceType, availabilityZone,
-				duration, fixedPrice, usagePrice, productDescription);
+				duration, fixedPrice, usagePrice, productDescription, tagSet);
 		this.start = start;
 		this.instanceCount = instanceCount;
 		this.state = state;

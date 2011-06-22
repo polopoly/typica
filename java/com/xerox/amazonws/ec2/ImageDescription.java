@@ -18,6 +18,7 @@
 package com.xerox.amazonws.ec2;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * An instance of this class represents an AMI description.
@@ -46,13 +47,16 @@ public class ImageDescription {
 	private String rootDeviceName;
 	private List<BlockDeviceMapping> blockDeviceMapping;
 	private String virtualizationType;
+	private Map<String, String> tagSet;
+	private String hypervisor;
 
 	public ImageDescription(String id, String loc, String owner,
 			String state, Boolean isPublic, List<String> productCodes,
 			String architecture, String imageType, String kernelId, String ramdiskId,
 			String platform, String reason, String imageOwnerAlias, String name,
 			String description, String rootDeviceType, String rootDeviceName,
-			List<BlockDeviceMapping> blockDeviceMapping, String virtualizationType) {
+			List<BlockDeviceMapping> blockDeviceMapping, String virtualizationType,
+			Map<String, String> tagSet, String hypervisor) {
 		this.imageId = id;
 		this.imageLocation = loc;
 		this.imageOwnerId = owner;
@@ -72,6 +76,8 @@ public class ImageDescription {
 		this.rootDeviceName = rootDeviceName;
 		this.blockDeviceMapping = blockDeviceMapping;
 		this.virtualizationType = virtualizationType;
+		this.tagSet = tagSet;
+		this.hypervisor = hypervisor;
 	}
 
 	public String getImageId() {
@@ -150,6 +156,14 @@ public class ImageDescription {
 		return virtualizationType;
 	}
 
+	public Map<String, String> getTagSet() {
+		return tagSet;
+	}
+
+	public String getHypervisor() {
+		return hypervisor;
+	}
+
 	public String toString() {
 		return "Image[ID=" + imageId + ", Loc=" + imageLocation + ", own="
 				+ imageOwnerId + ", state=" + imageState + " isPublic="
@@ -158,7 +172,8 @@ public class ImageDescription {
 				+ ramdiskId + ", platform=" + platform + ", reason="
 				+ reason + ", imgOwnrAlias=" + imageOwnerAlias + ", name="
 				+ name + ", descrip=" + description + ", rootDevType="
-				+ rootDeviceType + ", rootDevName=" + rootDeviceName + "]";
+				+ rootDeviceType + ", rootDevName=" + rootDeviceName
+				+ " hypervisor=" + hypervisor + "]";
 	}
 }
 

@@ -17,6 +17,8 @@
 
 package com.xerox.amazonws.ec2;
 
+import java.util.Map;
+
 public class ProductDescription {
 	private String id;
 	private InstanceType instanceType;
@@ -25,9 +27,11 @@ public class ProductDescription {
 	private double fixedPrice;
 	private double usagePrice;
 	private String productDescription;
+	private Map<String, String> tagSet;
 
 	public ProductDescription(String reservedInstanceOfferingId, InstanceType instanceType, String availabilityZone,
-							long duration, double fixedPrice, double usagePrice, String productDescription) {
+							long duration, double fixedPrice, double usagePrice, String productDescription,
+							Map<String, String> tagSet) {
 		this.id = reservedInstanceOfferingId;
 		this.instanceType = instanceType;
 		this.availabilityZone = availabilityZone;
@@ -35,6 +39,7 @@ public class ProductDescription {
 		this.fixedPrice = fixedPrice;
 		this.usagePrice = usagePrice;
 		this.productDescription = productDescription;
+		this.tagSet = tagSet;
 	}
 
 	public String getId() {
@@ -63,6 +68,10 @@ public class ProductDescription {
 
 	public String getProductDescription() {
 		return productDescription;
+	}
+
+	public Map<String, String> getTagSet() {
+		return tagSet;
 	}
 
 	public String toString() {

@@ -20,6 +20,7 @@ package com.xerox.amazonws.ec2;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An instance of this class represents an EC2 Snapshot.
@@ -39,10 +40,12 @@ public class SnapshotInfo {
 	private String volumeSize;
 	private String description;
 	private String ownerAlias;
+	private Map<String, String> tagSet;
 
 	public SnapshotInfo(String snapshotId, String volumeId,
 			String status, Calendar startTime, String progress,
-			String ownerId, String volumeSize, String description, String ownerAlias) {
+			String ownerId, String volumeSize, String description, String ownerAlias,
+			Map<String, String> tagSet) {
 		this.snapshotId = snapshotId;
 		this.volumeId = volumeId;
 		this.status = status;
@@ -52,6 +55,7 @@ public class SnapshotInfo {
 		this.volumeSize = volumeSize;
 		this.description = description;
 		this.ownerAlias = ownerAlias;
+		this.tagSet = tagSet;
 	}
 
 	public String getSnapshotId() {
@@ -88,6 +92,10 @@ public class SnapshotInfo {
 
 	public String getOwnerAlias() {
 		return ownerAlias;
+	}
+
+	public Map<String, String> getTagSet() {
+		return tagSet;
 	}
 
 	public String toString() {

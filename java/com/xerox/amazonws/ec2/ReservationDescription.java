@@ -19,8 +19,10 @@ package com.xerox.amazonws.ec2;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.xerox.amazonws.typica.jaxb.EbsInstanceBlockDeviceMappingResponseType;
 import com.xerox.amazonws.typica.jaxb.GroupItemType;
@@ -31,6 +33,8 @@ import com.xerox.amazonws.typica.jaxb.InstanceBlockDeviceMappingResponseItemType
 import com.xerox.amazonws.typica.jaxb.InstanceStateType;
 import com.xerox.amazonws.typica.jaxb.ProductCodesSetItemType;
 import com.xerox.amazonws.typica.jaxb.ProductCodeType;
+import com.xerox.amazonws.typica.jaxb.ResourceTagSetItemType;
+import com.xerox.amazonws.typica.jaxb.ResourceTagSetType;
 import com.xerox.amazonws.typica.jaxb.RunningInstancesItemType;
 import com.xerox.amazonws.typica.jaxb.RunningInstancesSetType;
 
@@ -168,6 +172,9 @@ public class ReservationDescription {
 		private String instanceLifecycle;
 		private String spotInstanceRequestId;
 		private String virtualizationType;
+		private String clientToken;
+		private Map<String, String> tagSet;
+		private String hypervisor;
 
 		public Instance(String imageId, String instanceId, String privateDnsName,
 				String dnsName, String stateName, String stateCode, String reason,
@@ -258,6 +265,18 @@ public class ReservationDescription {
 			this.instanceLifecycle = rsp_item.getInstanceLifecycle();
 			this.spotInstanceRequestId = rsp_item.getSpotInstanceRequestId();
 			this.virtualizationType = rsp_item.getVirtualizationType();
+			this.clientToken = rsp_item.getClientToken();
+			this.tagSet = new HashMap<String, String>();
+			ResourceTagSetType tagsettype = rsp_item.getTagSet();
+			if (tagsettype != null ) {
+				List<ResourceTagSetItemType> tagList = tagsettype.getItems();
+				if (tagList != null) {
+					for (ResourceTagSetItemType tag : tagList) {
+						tagSet.put(tag.getKey(), tag.getValue());
+					}
+				}
+			}
+			this.hypervisor = rsp_item.getHypervisor();
 		}
 
 		public String getImageId() {

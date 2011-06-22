@@ -3,6 +3,7 @@ package com.xerox.amazonws.ec2;
 import com.xerox.amazonws.typica.jaxb.SpotInstanceRequestSetItemType;
 
 import java.util.Calendar;
+import java.util.Map;
 
 public class SpotInstanceRequest {
     protected String spotInstanceRequestId;
@@ -18,11 +19,12 @@ public class SpotInstanceRequest {
     protected String instanceId;
     protected Calendar createTime;
     protected String productDescription;
+	protected Map<String, String> tagSet;
 
     public SpotInstanceRequest() {
     }
 
-    SpotInstanceRequest(SpotInstanceRequestSetItemType item) {
+    SpotInstanceRequest(SpotInstanceRequestSetItemType item, Map<String, String> tagSet) {
         this.spotInstanceRequestId = item.getSpotInstanceRequestId();
         this.spotPrice = Double.parseDouble(item.getSpotPrice());
         this.type = SpotInstanceType.getTypeFromString(item.getType());
@@ -32,6 +34,7 @@ public class SpotInstanceRequest {
         this.instanceId = item.getInstanceId();
         this.createTime = item.getCreateTime().toGregorianCalendar();
         this.productDescription = item.getProductDescription();
+		this.tagSet = tagSet;
     }
 
     public String getSpotInstanceRequestId() {
@@ -69,6 +72,10 @@ public class SpotInstanceRequest {
     public String getProductDescription() {
         return productDescription;
     }
+
+	public Map<String, String> getTagSet() {
+		return tagSet;
+	}
 
     @Override
     public String toString() {
