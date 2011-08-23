@@ -193,6 +193,7 @@
 				<include name="commons-codec-1.4.jar"/>
 				<include name="httpclient-4.0.jar"/>
 				<include name="httpcore-4.0.1.jar"/>
+				<include name="guava.jar"/>
 			</fileset>
 		</unzip>
 		<!--
@@ -223,6 +224,7 @@
 				<include name="commons-codec-1.4.jar"/>
 				<include name="httpclient-4.0.1.jar"/>
 				<include name="httpcore-4.0.1.jar"/>
+				<include name="guava.jar"/>
 			</fileset>
 		</unzip>
 		<jar destfile="${typica.querytool.jar.file}${rel.version}.jar">
