@@ -1,7 +1,7 @@
 //
 // typica - A client library for Amazon Web Services
 // Copyright (C) 2007 Xerox Corporation
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -32,12 +33,15 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
@@ -75,6 +79,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.google.common.collect.MapMaker;
 import com.xerox.amazonws.typica.jaxb.Response;
 import com.xerox.amazonws.typica.sqs2.jaxb.Error;
 import com.xerox.amazonws.typica.sqs2.jaxb.ErrorResponse;
@@ -103,6 +108,7 @@ public class AWSQueryConnection extends AWSConnection {
 	private int soTimeout = 0;
 	private int connectionTimeout = 0;
 	private TimeZone serverTimeZone = TimeZone.getTimeZone("GMT");
+	private Map<String, String> usedSignatures;
 
 	static {
 		String version = "?";
@@ -132,6 +138,7 @@ public class AWSQueryConnection extends AWSConnection {
     public AWSQueryConnection(String awsAccessId, String awsSecretKey, boolean isSecure,
                              String server, int port) {
 		super(awsAccessId, awsSecretKey, isSecure, server, port);
+		usedSignatures = new MapMaker().expiration(5, TimeUnit.MINUTES).makeMap();
     }
 
 	/**
@@ -300,7 +307,7 @@ public class AWSQueryConnection extends AWSConnection {
 	/**
 	 * This method returns the map of headers for this connection
 	 *
-	 * @return map of headers (modifiable) 
+	 * @return map of headers (modifiable)
 	 */
 	public Map<String, List<String>> getHeaders() {
 		return headers;
@@ -349,86 +356,32 @@ public class AWSQueryConnection extends AWSConnection {
 		throws HttpException, IOException, JAXBException, AWSException, SAXException {
 
 		// add auth params, and protocol specific headers
-        Map<String, String> qParams;
-        if (params != null) {
-            qParams = new HashMap<String, String>(params);
-        } else {
-            qParams = new HashMap<String, String>();
-        }
-        qParams.put("Action", action);
-		qParams.put("AWSAccessKeyId", getAwsAccessKeyId());
-		qParams.put("SignatureVersion", ""+getSignatureVersion());
-		qParams.put("Timestamp", httpDate(serverTimeZone));
-		if (getSignatureVersion() == 2) {
-			qParams.put("SignatureMethod", getAlgorithm());
-		}
-        if (headers != null) {
-            for (Iterator<String> i = headers.keySet().iterator(); i.hasNext(); ) {
-                String key = i.next();
-                for (Iterator<String> j = headers.get(key).iterator(); j.hasNext(); ) {
-					qParams.put(key, j.next());
-                }
-            }
-        }
+        Map<String, String> qParams = populateParams(action, params);
 		// sort params by key
-		ArrayList<String> keys = new ArrayList<String>(qParams.keySet());
-		if (getSignatureVersion() == 2) {
-			Collections.sort(keys);
-		}
-		else {
-			Collator stringCollator = Collator.getInstance();
-			stringCollator.setStrength(Collator.PRIMARY);
-			Collections.sort(keys, stringCollator);
-		}
+		ArrayList<String> keys = sortKeys(qParams);
 
-		// build param string
-		StringBuilder resource = new StringBuilder();
-		if (getSignatureVersion() == 0) {	// ensure Action, Timestamp come first!
-			resource.append(qParams.get("Action"));
-			resource.append(qParams.get("Timestamp"));
-		}
-		else if (getSignatureVersion() == 2) {
-			resource.append(method.getMethod());
-			resource.append("\n");
-			resource.append(getServer().toLowerCase());
-			resource.append("\n/");
-			String reqURL = makeURL("").toString();
-			// see if there is something after the host:port/ in the URL
-			if (reqURL.lastIndexOf('/') < (reqURL.length()-1)) {
-				// if so, put that here in the string to sign
-				// make sure we slice and dice at the right '/'
-				int idx = reqURL.lastIndexOf(':');
-				resource.append(reqURL.substring(reqURL.indexOf('/', idx)+1));
-			}
-			resource.append("\n");
-			boolean first = true;
-			for (String key : keys) {
-				if (!first) {
-					resource.append("&");
-				}
-				else { first = false; }
-				resource.append(key);
-				resource.append("=");
-				resource.append(urlencode(qParams.get(key)));
-//				System.err.println("encoded params "+key+" :"+(urlencode(qParams.get(key))));
-			}
-		}
-		else {
-			for (String key : keys) {
-				resource.append(key);
-				resource.append(qParams.get(key));
-			}
-		}
+		String signatureString = buildSignatureString(method, qParams, keys);
 		//System.err.println("String to sign :"+resource.toString());
 
 		// calculate signature
-       	String unencoded = encode(getSecretAccessKey(), resource.toString(), false);
+       	String unencoded = encode(getSecretAccessKey(), signatureString.toString(), false);
        	String encoded = urlencode(unencoded);
+       	// wait until we have a signature that hasn't already been used
+       	while (usedSignatures.containsKey(encoded)) {
+       		try {
+				Thread.sleep(1000);
+       		} catch (InterruptedException e) {
+       		}
+       		setTimestamp(qParams);
+       		unencoded = encode(getSecretAccessKey(), signatureString.toString(), false);
+       		encoded = urlencode(unencoded);
+       	}
+       	usedSignatures.put(encoded, encoded);
 		//System.err.println("sig = "+encoded);
-		
+
 
 		// build param string, encoding values and adding request signature
-		resource = new StringBuilder();
+		StringBuilder resource = new StringBuilder();
 		if (method.getMethod().equals("POST")) {
 			ArrayList<BasicNameValuePair> postParams = new ArrayList<BasicNameValuePair>();
 			for (String key : keys) {
@@ -516,6 +469,92 @@ public class AWSQueryConnection extends AWSConnection {
 		return (T)response;
 	}
 
+	private String buildSignatureString(HttpRequestBase method,
+			Map<String, String> qParams, ArrayList<String> keys)
+			throws MalformedURLException {
+		StringBuilder resource = new StringBuilder();
+		if (getSignatureVersion() == 0) {	// ensure Action, Timestamp come first!
+			resource.append(qParams.get("Action"));
+			resource.append(qParams.get("Timestamp"));
+		}
+		else if (getSignatureVersion() == 2) {
+			resource.append(method.getMethod());
+			resource.append("\n");
+			resource.append(getServer().toLowerCase());
+			resource.append("\n/");
+			String reqURL = makeURL("").toString();
+			// see if there is something after the host:port/ in the URL
+			if (reqURL.lastIndexOf('/') < (reqURL.length()-1)) {
+				// if so, put that here in the string to sign
+				// make sure we slice and dice at the right '/'
+				int idx = reqURL.lastIndexOf(':');
+				resource.append(reqURL.substring(reqURL.indexOf('/', idx)+1));
+			}
+			resource.append("\n");
+			boolean first = true;
+			for (String key : keys) {
+				if (!first) {
+					resource.append("&");
+				}
+				else { first = false; }
+				resource.append(key);
+				resource.append("=");
+				resource.append(urlencode(qParams.get(key)));
+//				System.err.println("encoded params "+key+" :"+(urlencode(qParams.get(key))));
+			}
+		}
+		else {
+			for (String key : keys) {
+				resource.append(key);
+				resource.append(qParams.get(key));
+			}
+		}
+		return resource.toString();
+	}
+
+	private ArrayList<String> sortKeys(Map<String, String> qParams) {
+		ArrayList<String> keys = new ArrayList<String>(qParams.keySet());
+		if (getSignatureVersion() == 2) {
+			Collections.sort(keys);
+		}
+		else {
+			Collator stringCollator = Collator.getInstance();
+			stringCollator.setStrength(Collator.PRIMARY);
+			Collections.sort(keys, stringCollator);
+		}
+		return keys;
+	}
+
+	private Map<String, String> populateParams(String action,
+			Map<String, String> params) {
+		Map<String, String> qParams;
+		if (params != null) {
+            qParams = new HashMap<String, String>(params);
+        } else {
+            qParams = new HashMap<String, String>();
+        }
+        qParams.put("Action", action);
+		qParams.put("AWSAccessKeyId", getAwsAccessKeyId());
+		qParams.put("SignatureVersion", ""+getSignatureVersion());
+		setTimestamp(qParams);
+		if (getSignatureVersion() == 2) {
+			qParams.put("SignatureMethod", getAlgorithm());
+		}
+        if (headers != null) {
+            for (Iterator<String> i = headers.keySet().iterator(); i.hasNext(); ) {
+                String key = i.next();
+                for (Iterator<String> j = headers.get(key).iterator(); j.hasNext(); ) {
+					qParams.put(key, j.next());
+                }
+            }
+        }
+		return qParams;
+	}
+
+	private void setTimestamp(Map<String, String> qParams) {
+		qParams.put("Timestamp", httpDate(serverTimeZone));
+	}
+
 	private void configureHttpClient() {
 		HttpParams params = new BasicHttpParams();
 
@@ -535,12 +574,12 @@ public class AWSQueryConnection extends AWSConnection {
 
 		hc = new TypicaHttpClient(connMgr, params);
 		//hc = new DefaultHttpClient(connMgr, params);
-		
+
 		if (proxyHost != null) {
 			DefaultHttpClient defaultHC = (DefaultHttpClient) hc;
  			log.info("Proxy Host set to "+proxyHost+":"+proxyPort);
 
-	        HttpHost proxy = new HttpHost(proxyHost, proxyPort); 
+	        HttpHost proxy = new HttpHost(proxyHost, proxyPort);
 
 	        defaultHC.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
 
@@ -734,7 +773,7 @@ public class AWSQueryConnection extends AWSConnection {
      */
     private static String httpDate(TimeZone serverTimeZone) {
         //final String DateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-        final String DateFormat = "yyyy-MM-dd'T'HH:mm:00'Z'";
+        final String DateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'";
         SimpleDateFormat format = new SimpleDateFormat( DateFormat, Locale.US );
         format.setTimeZone(serverTimeZone);
         return format.format( new Date() );
