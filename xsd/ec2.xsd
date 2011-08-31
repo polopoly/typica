@@ -385,6 +385,7 @@
 	<xs:sequence>
 	  <xs:element name="instanceId" type="xs:string"/>
 	  <xs:element name="currentState" type="tns:InstanceStateType"/>
+	  <xs:element name="shutdownState" type="tns:InstanceStateType"/>
 	  <xs:element name="previousState" type="tns:InstanceStateType"/>
 	</xs:sequence>
   </xs:complexType>
