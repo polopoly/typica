@@ -1,0 +1,54 @@
+<jxb:bindings version="1.0"
+               xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <jxb:bindings schemaLocation="AmazonLS.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.xerox.amazonws.typica.jaxb"/>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+  <jxb:bindings schemaLocation="ec2.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.xerox.amazonws.typica.jaxb"/>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+  <jxb:bindings schemaLocation="error.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.xerox.amazonws.typica.jaxb"/>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+  <jxb:bindings schemaLocation="sdb.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.xerox.amazonws.typica.sdb.jaxb"/>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+  <jxb:bindings schemaLocation="QueueService2.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.xerox.amazonws.typica.sqs2.jaxb"/>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+  <jxb:bindings schemaLocation="AmazonFPS.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.xerox.amazonws.typica.fps.jaxb"/>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+  <jxb:bindings schemaLocation="CloudWatch.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.xerox.amazonws.typica.monitor.jaxb"/>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+  <jxb:bindings schemaLocation="SimpleNotificationService.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.xerox.amazonws.typica.sns.jaxb"/>
+    </jxb:schemaBindings>
+  </jxb:bindings> 
+  <jxb:bindings schemaLocation="AutoScaling.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.xerox.amazonws.typica.autoscale.jaxb"/>
+    </jxb:schemaBindings>
+  </jxb:bindings> 
+  <jxb:bindings schemaLocation="ElasticLoadBalancing.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.xerox.amazonws.typica.loadbalance.jaxb"/> 
+    </jxb:schemaBindings>
+  </jxb:bindings>
+</jxb:bindings>
