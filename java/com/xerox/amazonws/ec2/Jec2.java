@@ -1,7 +1,7 @@
 //
 // typica - A client library for Amazon Web Services
 // Copyright (C) 2007,2008,2009,2010 Xerox Corporation
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,55 +19,55 @@ package com.xerox.amazonws.ec2;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
-import org.xml.sax.SAXException;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpException;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.xml.sax.SAXException;
 
 import com.xerox.amazonws.common.AWSException;
 import com.xerox.amazonws.common.AWSQueryConnection;
 import com.xerox.amazonws.typica.jaxb.AllocateAddressResponse;
 import com.xerox.amazonws.typica.jaxb.AssociateAddressResponse;
-import com.xerox.amazonws.typica.jaxb.AttachmentSetResponseType;
-import com.xerox.amazonws.typica.jaxb.AttachmentSetItemResponseType;
 import com.xerox.amazonws.typica.jaxb.AttachVolumeResponse;
+import com.xerox.amazonws.typica.jaxb.AttachmentSetItemResponseType;
+import com.xerox.amazonws.typica.jaxb.AttachmentSetResponseType;
+import com.xerox.amazonws.typica.jaxb.AuthorizeSecurityGroupIngressResponse;
 import com.xerox.amazonws.typica.jaxb.AvailabilityZoneItemType;
 import com.xerox.amazonws.typica.jaxb.AvailabilityZoneMessageType;
 import com.xerox.amazonws.typica.jaxb.AvailabilityZoneSetType;
-import com.xerox.amazonws.typica.jaxb.AuthorizeSecurityGroupIngressResponse;
-import com.xerox.amazonws.typica.jaxb.BlockDeviceMappingType;
 import com.xerox.amazonws.typica.jaxb.BlockDeviceMappingItemType;
+import com.xerox.amazonws.typica.jaxb.BlockDeviceMappingType;
 import com.xerox.amazonws.typica.jaxb.BundleInstanceResponse;
 import com.xerox.amazonws.typica.jaxb.BundleInstanceTaskType;
 import com.xerox.amazonws.typica.jaxb.CancelBundleTaskResponse;
 import com.xerox.amazonws.typica.jaxb.CancelSpotInstanceRequestsResponse;
 import com.xerox.amazonws.typica.jaxb.CancelSpotInstanceRequestsResponseSetItemType;
-import com.xerox.amazonws.typica.jaxb.CreatePlacementGroupResponse;
+import com.xerox.amazonws.typica.jaxb.ConfirmProductInstanceResponse;
 import com.xerox.amazonws.typica.jaxb.CreateImageResponse;
 import com.xerox.amazonws.typica.jaxb.CreateKeyPairResponse;
+import com.xerox.amazonws.typica.jaxb.CreatePlacementGroupResponse;
+import com.xerox.amazonws.typica.jaxb.CreateSecurityGroupResponse;
 import com.xerox.amazonws.typica.jaxb.CreateSnapshotResponse;
 import com.xerox.amazonws.typica.jaxb.CreateSpotDatafeedSubscriptionResponse;
 import com.xerox.amazonws.typica.jaxb.CreateTagsResponse;
-import com.xerox.amazonws.typica.jaxb.CreateVolumeResponse;
 import com.xerox.amazonws.typica.jaxb.CreateVolumePermissionItemType;
-import com.xerox.amazonws.typica.jaxb.ConfirmProductInstanceResponse;
-import com.xerox.amazonws.typica.jaxb.CreateSecurityGroupResponse;
-import com.xerox.amazonws.typica.jaxb.DeletePlacementGroupResponse;
+import com.xerox.amazonws.typica.jaxb.CreateVolumeResponse;
 import com.xerox.amazonws.typica.jaxb.DeleteKeyPairResponse;
+import com.xerox.amazonws.typica.jaxb.DeletePlacementGroupResponse;
 import com.xerox.amazonws.typica.jaxb.DeleteSecurityGroupResponse;
 import com.xerox.amazonws.typica.jaxb.DeleteSnapshotResponse;
 import com.xerox.amazonws.typica.jaxb.DeleteSpotDatafeedSubscriptionResponse;
@@ -83,57 +83,54 @@ import com.xerox.amazonws.typica.jaxb.DescribeImageAttributeResponse;
 import com.xerox.amazonws.typica.jaxb.DescribeImagesResponse;
 import com.xerox.amazonws.typica.jaxb.DescribeImagesResponseInfoType;
 import com.xerox.amazonws.typica.jaxb.DescribeImagesResponseItemType;
-import com.xerox.amazonws.typica.jaxb.DescribeInstancesResponse;
 import com.xerox.amazonws.typica.jaxb.DescribeInstanceAttributeResponse;
-import com.xerox.amazonws.typica.jaxb.DescribePlacementGroupsResponse;
-import com.xerox.amazonws.typica.jaxb.DescribeReservedInstancesResponse;
-import com.xerox.amazonws.typica.jaxb.DescribeReservedInstancesResponseSetItemType;
-import com.xerox.amazonws.typica.jaxb.DescribeReservedInstancesOfferingsResponse;
-import com.xerox.amazonws.typica.jaxb.DescribeReservedInstancesOfferingsResponseSetItemType;
-import com.xerox.amazonws.typica.jaxb.DescribeSnapshotsResponse;
-import com.xerox.amazonws.typica.jaxb.DescribeSnapshotAttributeResponse;
-import com.xerox.amazonws.typica.jaxb.DescribeSnapshotsSetResponseType;
-import com.xerox.amazonws.typica.jaxb.DescribeSnapshotsSetItemResponseType;
-import com.xerox.amazonws.typica.jaxb.DescribeSpotDatafeedSubscriptionResponse;
-import com.xerox.amazonws.typica.jaxb.DescribeSpotInstanceRequestsResponse;
-import com.xerox.amazonws.typica.jaxb.DescribeTagsResponse;
-import com.xerox.amazonws.typica.jaxb.DescribeVolumesResponse;
-import com.xerox.amazonws.typica.jaxb.DescribeVolumesSetResponseType;
-import com.xerox.amazonws.typica.jaxb.DescribeVolumesSetItemResponseType;
+import com.xerox.amazonws.typica.jaxb.DescribeInstancesResponse;
 import com.xerox.amazonws.typica.jaxb.DescribeKeyPairsResponse;
 import com.xerox.amazonws.typica.jaxb.DescribeKeyPairsResponseInfoType;
 import com.xerox.amazonws.typica.jaxb.DescribeKeyPairsResponseItemType;
+import com.xerox.amazonws.typica.jaxb.DescribePlacementGroupsResponse;
 import com.xerox.amazonws.typica.jaxb.DescribeRegionsResponse;
+import com.xerox.amazonws.typica.jaxb.DescribeReservedInstancesOfferingsResponse;
+import com.xerox.amazonws.typica.jaxb.DescribeReservedInstancesOfferingsResponseSetItemType;
+import com.xerox.amazonws.typica.jaxb.DescribeReservedInstancesResponse;
+import com.xerox.amazonws.typica.jaxb.DescribeReservedInstancesResponseSetItemType;
 import com.xerox.amazonws.typica.jaxb.DescribeSecurityGroupsResponse;
+import com.xerox.amazonws.typica.jaxb.DescribeSnapshotAttributeResponse;
+import com.xerox.amazonws.typica.jaxb.DescribeSnapshotsResponse;
+import com.xerox.amazonws.typica.jaxb.DescribeSnapshotsSetItemResponseType;
+import com.xerox.amazonws.typica.jaxb.DescribeSnapshotsSetResponseType;
+import com.xerox.amazonws.typica.jaxb.DescribeSpotDatafeedSubscriptionResponse;
+import com.xerox.amazonws.typica.jaxb.DescribeSpotInstanceRequestsResponse;
 import com.xerox.amazonws.typica.jaxb.DescribeSpotPriceHistoryResponse;
+import com.xerox.amazonws.typica.jaxb.DescribeTagsResponse;
+import com.xerox.amazonws.typica.jaxb.DescribeVolumesResponse;
+import com.xerox.amazonws.typica.jaxb.DescribeVolumesSetItemResponseType;
+import com.xerox.amazonws.typica.jaxb.DescribeVolumesSetResponseType;
 import com.xerox.amazonws.typica.jaxb.DetachVolumeResponse;
 import com.xerox.amazonws.typica.jaxb.DisassociateAddressResponse;
 import com.xerox.amazonws.typica.jaxb.EbsBlockDeviceType;
 import com.xerox.amazonws.typica.jaxb.GetConsoleOutputResponse;
 import com.xerox.amazonws.typica.jaxb.GetPasswordDataResponse;
-import com.xerox.amazonws.typica.jaxb.GroupItemType;
-import com.xerox.amazonws.typica.jaxb.GroupSetType;
 import com.xerox.amazonws.typica.jaxb.ImportKeyPairResponse;
 import com.xerox.amazonws.typica.jaxb.InstanceStateChangeSetType;
 import com.xerox.amazonws.typica.jaxb.InstanceStateChangeType;
+import com.xerox.amazonws.typica.jaxb.InstanceStateType;
 import com.xerox.amazonws.typica.jaxb.IpPermissionSetType;
 import com.xerox.amazonws.typica.jaxb.IpPermissionType;
 import com.xerox.amazonws.typica.jaxb.IpRangeItemType;
-import com.xerox.amazonws.typica.jaxb.IpRangeSetType;
 import com.xerox.amazonws.typica.jaxb.LaunchPermissionItemType;
 import com.xerox.amazonws.typica.jaxb.LaunchPermissionListType;
 import com.xerox.amazonws.typica.jaxb.ModifyImageAttributeResponse;
 import com.xerox.amazonws.typica.jaxb.ModifyInstanceAttributeResponse;
 import com.xerox.amazonws.typica.jaxb.ModifySnapshotAttributeResponse;
-import com.xerox.amazonws.typica.jaxb.MonitorInstancesResponseType;
 import com.xerox.amazonws.typica.jaxb.MonitorInstancesResponseSetItemType;
+import com.xerox.amazonws.typica.jaxb.MonitorInstancesResponseType;
 import com.xerox.amazonws.typica.jaxb.NullableAttributeValueType;
-import com.xerox.amazonws.typica.jaxb.ObjectFactory;
 import com.xerox.amazonws.typica.jaxb.PlacementGroupInfoType;
-import com.xerox.amazonws.typica.jaxb.ProductCodeListType;
 import com.xerox.amazonws.typica.jaxb.ProductCodeItemType;
-import com.xerox.amazonws.typica.jaxb.ProductCodesSetType;
+import com.xerox.amazonws.typica.jaxb.ProductCodeListType;
 import com.xerox.amazonws.typica.jaxb.ProductCodesSetItemType;
+import com.xerox.amazonws.typica.jaxb.ProductCodesSetType;
 import com.xerox.amazonws.typica.jaxb.PurchaseReservedInstancesOfferingResponse;
 import com.xerox.amazonws.typica.jaxb.RebootInstancesResponse;
 import com.xerox.amazonws.typica.jaxb.RegionItemType;
@@ -141,28 +138,25 @@ import com.xerox.amazonws.typica.jaxb.RegionSetType;
 import com.xerox.amazonws.typica.jaxb.RegisterImageResponse;
 import com.xerox.amazonws.typica.jaxb.ReleaseAddressResponse;
 import com.xerox.amazonws.typica.jaxb.RequestSpotInstancesResponse;
-import com.xerox.amazonws.typica.jaxb.RevokeSecurityGroupIngressResponse;
-import com.xerox.amazonws.typica.jaxb.ReservationSetType;
 import com.xerox.amazonws.typica.jaxb.ReservationInfoType;
+import com.xerox.amazonws.typica.jaxb.ReservationSetType;
 import com.xerox.amazonws.typica.jaxb.ResetImageAttributeResponse;
 import com.xerox.amazonws.typica.jaxb.ResetInstanceAttributeResponse;
 import com.xerox.amazonws.typica.jaxb.ResetSnapshotAttributeResponse;
 import com.xerox.amazonws.typica.jaxb.ResourceTagSetItemType;
 import com.xerox.amazonws.typica.jaxb.ResourceTagSetType;
-import com.xerox.amazonws.typica.jaxb.RunningInstancesItemType;
-import com.xerox.amazonws.typica.jaxb.RunningInstancesSetType;
+import com.xerox.amazonws.typica.jaxb.RevokeSecurityGroupIngressResponse;
 import com.xerox.amazonws.typica.jaxb.RunInstancesResponse;
-import com.xerox.amazonws.typica.jaxb.SecurityGroupSetType;
 import com.xerox.amazonws.typica.jaxb.SecurityGroupItemType;
-import com.xerox.amazonws.typica.jaxb.SpotPriceHistorySetItemType;
+import com.xerox.amazonws.typica.jaxb.SecurityGroupSetType;
 import com.xerox.amazonws.typica.jaxb.SpotInstanceRequestSetItemType;
+import com.xerox.amazonws.typica.jaxb.SpotPriceHistorySetItemType;
 import com.xerox.amazonws.typica.jaxb.StartInstancesResponse;
 import com.xerox.amazonws.typica.jaxb.StopInstancesResponse;
 import com.xerox.amazonws.typica.jaxb.TagSetItemType;
 import com.xerox.amazonws.typica.jaxb.TagSetType;
 import com.xerox.amazonws.typica.jaxb.TerminateInstancesResponse;
 import com.xerox.amazonws.typica.jaxb.UserIdGroupPairType;
-import com.xerox.amazonws.typica.jaxb.UserIdGroupPairSetType;
 
 /**
  * A Java wrapper for the EC2 web services API
@@ -231,7 +225,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * @param instanceId An instance's id ({@link com.xerox.amazonws.ec2.ReservationDescription.Instance#instanceId}.
 	 * @param name a name to associate with the image
 	 * @param description a descriptive string to attach to the image
-	 * @param noReboot	normally false; if set to true, instance is not shutdown first. 
+	 * @param noReboot	normally false; if set to true, instance is not shutdown first.
 	 * 					NOTE: filesystem integrity isn't guaranteed when noReboot=true
 	 * @return image ID
 	 * @throws EC2Exception wraps checked exceptions
@@ -255,7 +249,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Register an S3 based AMI.
-	 * 
+	 *
 	 * @param imageLocation An AMI path within S3.
 	 * @return A unique AMI ID that can be used to create and manage instances of this AMI.
 	 * @throws EC2Exception wraps checked exceptions
@@ -267,7 +261,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Register a snapshot as an EBS backed AMI
-	 * 
+	 *
 	 * @param imageLocation An AMI path within S3.
 	 * @return A unique AMI ID that can be used to create and manage instances of this AMI.
 	 * @throws EC2Exception wraps checked exceptions
@@ -338,7 +332,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Deregister the given AMI.
-	 * 
+	 *
 	 * @param imageId An AMI ID as returned by {@link #registerImage(String)}.
 	 * @throws EC2Exception wraps checked exceptions
 	 * TODO: need to return request id
@@ -356,7 +350,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Describe the given AMIs.
-	 * 
+	 *
 	 * @param imageIds An array of AMI IDs as returned by {@link #registerImage(String)}.
 	 * @return A list of {@link ImageDescription} instances describing each AMI ID.
 	 * @throws EC2Exception wraps checked exceptions
@@ -367,7 +361,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Describe the given AMIs.
-	 * 
+	 *
 	 * @param imageIds A list of AMI IDs as returned by {@link #registerImage(String)}.
 	 * @return A list of {@link ImageDescription} instances describing each AMI ID.
 	 * @throws EC2Exception wraps checked exceptions
@@ -394,7 +388,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Describe the AMIs belonging to the supplied owners.
-	 * 
+	 *
 	 * @param owners A list of owners.
 	 * @return A list of {@link ImageDescription} instances describing each AMI ID.
 	 * @throws EC2Exception wraps checked exceptions
@@ -421,7 +415,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Describe the AMIs executable by supplied users.
-	 * 
+	 *
 	 * @param users A list of users.
 	 * @return A list of {@link ImageDescription} instances describing each AMI ID.
 	 * @throws EC2Exception wraps checked exceptions
@@ -448,7 +442,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Describe the AMIs that match the intersection of the criteria supplied
-	 * 
+	 *
 	 * @param imageIds A list of AMI IDs as returned by {@link #registerImage(String)}.
 	 * @param owners A list of owners.
 	 * @param users A list of users.
@@ -549,7 +543,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * <p>
 	 * NOTE: this method defaults to the AWS desired "public" addressing type.
 	 * NOTE: this method defaults to the small(traditional) instance type.
-	 * 
+	 *
 	 * @param imageId An AMI ID as returned by {@link #registerImage(String)}.
 	 * @param minCount The minimum number of instances to attempt to reserve.
 	 * @param maxCount The maximum number of instances to attempt to reserve.
@@ -574,7 +568,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * If less than <code>minCount</code> instances are available no instances
 	 * will be reserved.
 	 * NOTE: this method defaults to the small(traditional) instance type.
-	 * 
+	 *
 	 * @param imageId An AMI ID as returned by {@link #registerImage(String)}.
 	 * @param minCount The minimum number of instances to attempt to reserve.
 	 * @param maxCount The maximum number of instances to attempt to reserve.
@@ -600,7 +594,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * If less than <code>minCount</code> instances are available no instances
 	 * will be reserved.
 	 * NOTE: this method defaults to the AWS desired "public" addressing type.
-	 * 
+	 *
 	 * @param imageId An AMI ID as returned by {@link #registerImage(String)}.
 	 * @param minCount The minimum number of instances to attempt to reserve.
 	 * @param maxCount The maximum number of instances to attempt to reserve.
@@ -625,7 +619,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * <p>
 	 * If less than <code>minCount</code> instances are available no instances
 	 * will be reserved.
-	 * 
+	 *
 	 * @param imageId An AMI ID as returned by {@link #registerImage(String)}.
 	 * @param minCount The minimum number of instances to attempt to reserve.
 	 * @param maxCount The maximum number of instances to attempt to reserve.
@@ -651,7 +645,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * <p>
 	 * If less than <code>minCount</code> instances are available no instances
 	 * will be reserved.
-	 * 
+	 *
 	 * @param imageId An AMI ID as returned by {@link #registerImage(String)}.
 	 * @param minCount The minimum number of instances to attempt to reserve.
 	 * @param maxCount The maximum number of instances to attempt to reserve.
@@ -698,7 +692,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * <p>
 	 * If less than <code>minCount</code> instances are available no instances
 	 * will be reserved.
-	 * 
+	 *
 	 * @param lc object containing launch configuration
 	 * @return A {@link com.xerox.amazonws.ec2.ReservationDescription} describing the instances that
 	 *         have been reserved.
@@ -720,7 +714,7 @@ public class Jec2 extends AWSQueryConnection {
 
     /**
 	 * Starts a selection of stopped instances.
-	 * 
+	 *
 	 * @param instanceIds An array of instances ({@link com.xerox.amazonws.ec2.ReservationDescription.Instance#instanceId}.
 	 * @return A list of {@link InstanceStateChangeDescription} instances.
 	 * @throws EC2Exception wraps checked exceptions
@@ -731,7 +725,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Starts a selection of stopped instances.
-	 * 
+	 *
 	 * @param instanceIds A list of instances ({@link com.xerox.amazonws.ec2.ReservationDescription.Instance#instanceId}.
 	 * @return A list of {@link InstanceStateChangeDescription} instances.
 	 * @throws EC2Exception wraps checked exceptions
@@ -764,7 +758,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Stops a selection of running instances.
-	 * 
+	 *
 	 * @param instanceIds An array of instances ({@link com.xerox.amazonws.ec2.ReservationDescription.Instance#instanceId}.
 	 * @param force forces the instance to stop. bypasses filesystem flush. Use with caution!
 	 * @return A list of {@link InstanceStateChangeDescription} instances.
@@ -776,7 +770,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Stops a selection of running instances.
-	 * 
+	 *
 	 * @param instanceIds A list of instances ({@link com.xerox.amazonws.ec2.ReservationDescription.Instance#instanceId}.
 	 * @param force forces the instance to stop. bypasses filesystem flush. Use with caution!
 	 * @return A list of {@link InstanceStateChangeDescription} instances.
@@ -810,7 +804,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Terminates a selection of running instances.
-	 * 
+	 *
 	 * @param instanceIds An array of instances ({@link com.xerox.amazonws.ec2.ReservationDescription.Instance#instanceId}.
 	 * @return A list of {@link InstanceStateChangeDescription} instances.
 	 * @throws EC2Exception wraps checked exceptions
@@ -821,7 +815,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Terminates a selection of running instances.
-	 * 
+	 *
 	 * @param instanceIds A list of instances ({@link com.xerox.amazonws.ec2.ReservationDescription.Instance#instanceId}.
 	 * @return A list of {@link InstanceStateChangeDescription} instances.
 	 * @throws EC2Exception wraps checked exceptions
@@ -840,15 +834,24 @@ public class Jec2 extends AWSQueryConnection {
 					new ArrayList<InstanceStateChangeDescription>();
 		InstanceStateChangeSetType set = response.getInstancesSet();
 		Iterator instances_iter = set.getItems().iterator();
-		while (instances_iter.hasNext()) {
-			InstanceStateChangeType rsp_item =
+			while (instances_iter.hasNext()) {
+				InstanceStateChangeType rsp_item =
 					(InstanceStateChangeType)instances_iter.next();
-			res.add(new InstanceStateChangeDescription(
-					rsp_item.getInstanceId(), rsp_item.getPreviousState().getName(),
-					rsp_item.getPreviousState().getCode(),
-					rsp_item.getCurrentState().getName(),
-					rsp_item.getCurrentState().getCode()));
-		}
+				try {
+					InstanceStateType currentState = rsp_item.getCurrentState();
+					if (currentState == null) {
+						currentState = rsp_item.getShutdownState();
+					}
+					res.add(new InstanceStateChangeDescription(
+							rsp_item.getInstanceId(), rsp_item.getPreviousState().getName(),
+							rsp_item.getPreviousState().getCode(),
+							currentState != null ? currentState.getName() : null,
+							currentState != null ? currentState.getCode() : -1));
+				}
+				catch (RuntimeException e) {
+					throw e;
+				}
+			}
 		return res;
 	}
 
@@ -858,7 +861,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * If the array of instance IDs is empty then a list of all instances owned
 	 * by the caller will be returned. Otherwise the list will contain
 	 * information for the requested instances only.
-	 * 
+	 *
 	 * @param instanceIds An array of instances ({@link com.xerox.amazonws.ec2.ReservationDescription.Instance#instanceId}.
 	 * @return A list of {@link com.xerox.amazonws.ec2.ReservationDescription} instances.
 	 * @throws EC2Exception wraps checked exceptions
@@ -873,7 +876,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * If the list of instance IDs is empty then a list of all instances owned
 	 * by the caller will be returned. Otherwise the list will contain
 	 * information for the requested instances only.
-	 * 
+	 *
 	 * @param instanceIds A list of instances ({@link com.xerox.amazonws.ec2.ReservationDescription.Instance#instanceId}.
 	 * @return A list of {@link com.xerox.amazonws.ec2.ReservationDescription} instances.
 	 * @throws EC2Exception wraps checked exceptions
@@ -918,7 +921,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Reboot a selection of running instances.
-	 * 
+	 *
 	 * @param instanceIds A list of instances ({@link com.xerox.amazonws.ec2.ReservationDescription.Instance#instanceId}.
 	 * @throws EC2Exception wraps checked exceptions
 	 * TODO: need to return request id
@@ -929,7 +932,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Reboot a selection of running instances.
-	 * 
+	 *
 	 * @param instanceIds A list of instances ({@link com.xerox.amazonws.ec2.ReservationDescription.Instance#instanceId}.
 	 * @throws EC2Exception wraps checked exceptions
 	 * TODO: need to return request id
@@ -949,7 +952,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Changes one of a variety of settings for a instance.
-	 * 
+	 *
 	 * @param instanceId the instance you are addressing
 	 * @param attribute for now, should be (instanceType|kernel|ramdisk|userData|disableApiTermination|instanceInitatedShutdownBehavior|rootDeviceName|blockDeviceMapping)
 	 * @param value value of the attribute
@@ -986,7 +989,7 @@ public class Jec2 extends AWSQueryConnection {
 			throw new EC2Exception("Could not reset instance attribute. No reason given.");
 		}
 	}
-	
+
 	/**
 	 * Describes an attribute of an instance.
 	 *
@@ -1003,7 +1006,7 @@ public class Jec2 extends AWSQueryConnection {
 		HttpGet method = new HttpGet();
 		DescribeInstanceAttributeResponse response =
 				makeRequestInt(method, "DescribeInstanceAttribute", params, DescribeInstanceAttributeResponse.class);
-			
+
 		return new DescribeInstanceAttributeResult(response);
 	}
 
@@ -1043,8 +1046,8 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Creates a security group.
-	 * 
-	 * @param name The name of the security group. 
+	 *
+	 * @param name The name of the security group.
 	 * @param desc The description of the security group.
 	 * @throws EC2Exception wraps checked exceptions
 	 */
@@ -1061,9 +1064,9 @@ public class Jec2 extends AWSQueryConnection {
 	}
 
 	/**
-	 * Deletes a security group. 
+	 * Deletes a security group.
 	 *
-	 * @param name The name of the security group. 
+	 * @param name The name of the security group.
 	 * @throws EC2Exception wraps checked exceptions
 	 */
 	public void deleteSecurityGroup(String name) throws EC2Exception {
@@ -1078,7 +1081,7 @@ public class Jec2 extends AWSQueryConnection {
 	}
 
 	/**
-	 * Gets a list of security groups and their associated permissions.  
+	 * Gets a list of security groups and their associated permissions.
 	 *
 	 * @param groupNames An array of groups to describe.
 	 * @return A list of groups ({@link GroupDescription}.
@@ -1090,8 +1093,8 @@ public class Jec2 extends AWSQueryConnection {
 	}
 
 	/**
-	 * Gets a list of security groups and their associated permissions.  
-	 * 
+	 * Gets a list of security groups and their associated permissions.
+	 *
 	 * @param groupNames A list of groups to describe.
 	 * @return A list of groups ({@link GroupDescription}.
 	 * @throws EC2Exception wraps checked exceptions
@@ -1155,7 +1158,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Adds incoming permissions to a security group.
-	 * 
+	 *
 	 * @param groupName name of group to modify
 	 * @param secGroupName name of security group to authorize access to
 	 * @param secGroupOwnerId owner of security group to authorize access to
@@ -1177,7 +1180,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Adds incoming permissions to a security group.
-	 * 
+	 *
 	 * @param groupName name of group to modify
 	 * @param ipProtocol protocol to authorize (tcp, udp, icmp)
 	 * @param fromPort bottom of port range to authorize
@@ -1204,7 +1207,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Revokes incoming permissions from a security group.
-	 * 
+	 *
 	 * @param groupName name of group to modify
 	 * @param secGroupName name of security group to revoke access from
 	 * @param secGroupOwnerId owner of security group to revoke access from
@@ -1226,7 +1229,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Revokes incoming permissions from a security group.
-	 * 
+	 *
 	 * @param groupName name of group to modify
 	 * @param ipProtocol protocol to revoke (tcp, udp, icmp)
 	 * @param fromPort bottom of port range to revoke
@@ -1254,7 +1257,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Creates a public/private keypair.
-	 * 
+	 *
 	 * @param keyName Name of the keypair.
 	 * @return A keypair description ({@link KeyPairInfo}).
 	 * @throws EC2Exception wraps checked exceptions
@@ -1273,7 +1276,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Lists public/private keypairs.
-	 * 
+	 *
 	 * @param keyIds An array of keypairs.
 	 * @return A list of keypair descriptions ({@link KeyPairInfo}).
 	 * @throws EC2Exception wraps checked exceptions
@@ -1285,7 +1288,7 @@ public class Jec2 extends AWSQueryConnection {
 	/**
 	 * Lists public/private keypairs. NOTE: the KeyPairInfo.getMaterial() method will return null
 	 * because this API call doesn't return the keypair material.
-	 * 
+	 *
 	 * @param keyIds A list of keypairs.
 	 * @return A list of keypair descriptions ({@link KeyPairInfo}).
 	 * @throws EC2Exception wraps checked exceptions
@@ -1329,7 +1332,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Deletes a public/private keypair.
-	 * 
+	 *
 	 * @param keyName Name of the keypair.
 	 * @throws EC2Exception wraps checked exceptions
 	 * TODO: need to return request id
@@ -1374,9 +1377,9 @@ public class Jec2 extends AWSQueryConnection {
 		add,
 		remove
 	}
-	
+
 	/**
-	 * Modifies an attribute by the given items with the given operation. 
+	 * Modifies an attribute by the given items with the given operation.
 	 *
 	 * @param imageId The ID of the AMI to modify the attributes for.
 	 * @param attribute The name of the attribute to change.
@@ -1419,7 +1422,7 @@ public class Jec2 extends AWSQueryConnection {
 			throw new EC2Exception("Could not reset image attribute. No reason given.");
 		}
 	}
-	
+
 	/**
 	 * Resets an attribute on an AMI.
 	 *
@@ -1443,7 +1446,7 @@ public class Jec2 extends AWSQueryConnection {
 			throw new EC2Exception("Could not reset image attribute. No reason given.");
 		}
 	}
-	
+
 	/**
 	 * Describes an attribute of an AMI.
 	 *
@@ -1739,7 +1742,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * If the array of volume IDs is empty then a list of all volumes owned
 	 * by the caller will be returned. Otherwise the list will contain
 	 * information for the requested volumes only.
-	 * 
+	 *
 	 * @param volumeIds An array of volumes ({@link com.xerox.amazonws.ec2.VolumeInfo}.
 	 * @return A list of {@link com.xerox.amazonws.ec2.VolumeInfo} volumes.
 	 * @throws EC2Exception wraps checked exceptions
@@ -1754,7 +1757,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * If the list of volume IDs is empty then a list of all volumes owned
 	 * by the caller will be returned. Otherwise the list will contain
 	 * information for the requested volumes only.
-	 * 
+	 *
 	 * @param volumeIds A list of volumes ({@link com.xerox.amazonws.ec2.VolumeInfo}.
 	 * @return A list of {@link com.xerox.amazonws.ec2.VolumeInfo} volumes.
 	 * @throws EC2Exception wraps checked exceptions
@@ -1902,7 +1905,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * If the array of snapshot IDs is empty then a list of all snapshots owned
 	 * by the caller will be returned. Otherwise the list will contain
 	 * information for the requested snapshots only.
-	 * 
+	 *
 	 * @param snapshotIds An array of snapshots ({@link com.xerox.amazonws.ec2.SnapshotInfo}.
 	 * @return A list of {@link com.xerox.amazonws.ec2.VolumeInfo} volumes.
 	 * @throws EC2Exception wraps checked exceptions
@@ -1917,7 +1920,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * If the list of snapshot IDs is empty then a list of all snapshots owned
 	 * by the caller will be returned. Otherwise the list will contain
 	 * information for the requested snapshots only.
-	 * 
+	 *
 	 * @param snapshotIds A list of snapshots ({@link com.xerox.amazonws.ec2.SnapshotInfo}.
 	 * @return A list of {@link com.xerox.amazonws.ec2.VolumeInfo} volumes.
 	 * @throws EC2Exception wraps checked exceptions
@@ -1932,7 +1935,7 @@ public class Jec2 extends AWSQueryConnection {
 	 * If the list of snapshot IDs is empty then a list of all snapshots owned
 	 * by the caller will be returned. Otherwise the list will contain
 	 * information for the requested snapshots only.
-	 * 
+	 *
 	 * @param snapshotIds A list of snapshots ({@link com.xerox.amazonws.ec2.SnapshotInfo}.
 	 * @param owner limits results to snapshots owned by this user
 	 * @param restorableBy limits results to account that can create volumes from this snapshot
@@ -1992,7 +1995,7 @@ public class Jec2 extends AWSQueryConnection {
 
 	/**
 	 * Changes permissions settings of a snapshot.
-	 * 
+	 *
 	 * @param snapshotId the snapshot you are addressing
 	 * @param attribute for now, should be "createVolumePermission"
 	 * @param opType either add or remove
@@ -2039,7 +2042,7 @@ public class Jec2 extends AWSQueryConnection {
 			throw new EC2Exception("Could not reset snapshot attribute. No reason given.");
 		}
 	}
-	
+
 	/**
 	 * Describes an attribute of a snapshot.
 	 *
@@ -2056,7 +2059,7 @@ public class Jec2 extends AWSQueryConnection {
 		HttpGet method = new HttpGet();
 		DescribeSnapshotAttributeResponse response =
 				makeRequestInt(method, "DescribeSnapshotAttribute", params, DescribeSnapshotAttributeResponse.class);
-		
+
 		DescribeSnapshotAttributeResult ret = new DescribeSnapshotAttributeResult(response.getSnapshotId());
 		List<CreateVolumePermissionItemType> list = response.getCreateVolumePermission().getItems();
 		if (list != null) {
@@ -2400,7 +2403,7 @@ public class Jec2 extends AWSQueryConnection {
 		}
 		return ret;
 	}
-    
+
     public List<SpotPriceHistoryItem> describeSpotPriceHistory(Calendar start, Calendar end, String productDescription, InstanceType... instanceTypes) throws EC2Exception {
 		List<InstanceType> types = new ArrayList<InstanceType>();
 		for (int i = 0; i < instanceTypes.length; i++) {
