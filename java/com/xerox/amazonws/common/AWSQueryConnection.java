@@ -374,6 +374,7 @@ public class AWSQueryConnection extends AWSConnection {
        		} catch (InterruptedException e) {
        		}
        		setTimestamp(qParams);
+       		signatureString = buildSignatureString(method, qParams, keys);
        		unencoded = encode(getSecretAccessKey(), signatureString.toString(), false);
        		encoded = urlencode(unencoded);
        	}
